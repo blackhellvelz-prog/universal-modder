@@ -2713,6 +2713,43 @@
   ]
  },
  {
+  "path": "games/minecraft/neoforge-26-2-modpack-audit-perf-mods.md",
+  "kind": "game",
+  "title": "Minecraft 26.2 NeoForge modpack audit: diagnostics mod, javac builds, zombie-process and config-loop root causes, measured perf mods",
+  "game": "Minecraft",
+  "games_also": [],
+  "game_version": "26.2 (NeoForge 26.2.0.88, FML 11.0.16, Java 25)",
+  "platform": "windows",
+  "engine": "java",
+  "route": "managed-patch",
+  "tools": [
+   "javac (JDK 25)",
+   "Vineflower 1.12",
+   "javap",
+   "jcmd",
+   "Python 3.12"
+  ],
+  "anti_cheat": "none (singleplayer)",
+  "status": "working",
+  "agents": [
+   "Claude Opus 5.5"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [],
+  "tags": [
+   "neoforge",
+   "mixin",
+   "profiling",
+   "modpack",
+   "memory",
+   "zgc",
+   "lithium",
+   "entityculling",
+   "tlauncher"
+  ]
+ },
+ {
   "path": "games/minecraft/resident-evil-2-s-live-picture-composited-into-minecraft-wit.md",
   "kind": "game",
   "title": "Resident Evil 2's live picture composited into Minecraft with depth",

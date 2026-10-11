@@ -126,3 +126,17 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    answers: 0 mismatches. Effect: TF's share of server-thread samples halved, but MSPT only 15.5 -> 14.9 ms (-4%,
    ABAB without profiler). A profiled pair had shown -12.6%: the sampler inflates hot-call costs, so confirm
    gains with interleaved unprofiled runs.
+12. Twilight Forest re26 port: `sounds.json` references 92 .ogg files the jar lacks (beetles, helmet crab, penguin,
+   squirrel, troll, jar, candelabra, scepters). Upstream github.com/TeamTwilight/twilightforest (branch `latest`)
+   has them unchanged under `src/main/resources/assets/twilightforest/sounds/` (assets CC BY-NC-SA 4.0; official TF
+   is not on Modrinth). Ship them in a local resource jar with attribution.
+13. JEI 30.x moved output computation into `SmithingCategoryExtension.setOutput`, which uses JEI's platform
+   `RecipeHelper` (vanilla transform/trim only). Mods whose smithing extension subclasses that internal class
+   without overriding `setOutput` (TF's NoTemplateSmithingExtension) now fail with "Unknown recipe type"; a mixin
+   can add the missing `setOutput` with the erased signature `(SmithingRecipe, IIngredientAcceptor)`.
+   26.2 also forbids `Ingredient.getValues()` on NeoForge custom ingredients - use `display().resolveForStacks`.
+14. NeoForge 26.2 loads every file in `data/*/loot_modifiers/` as a modifier; the old
+   `neoforge:loot_modifiers/global_loot_modifiers.json` list ({"replace","entries"}) is obsolete and logs
+   "No key type". Mods' own modifiers still work; overriding the list with a no-op `neoforge:add_table` silences it.
+15. Better Village 4.0.0 (26.2) ships a corrupted `desert_meeting_point_3.nbt` (gzip CRC error); the vanilla file
+   from the game jar is a drop-in replacement.

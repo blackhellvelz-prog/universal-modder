@@ -15,7 +15,7 @@ agents:
 humans: []
 date: '2026-10-11'
 links: []
-tags: [neoforge, mixin, profiling, modpack, memory, zgc, lithium, entityculling, tlauncher, twilightforest, jei]
+tags: [neoforge, mixin, profiling, modpack, memory, zgc, lithium, entityculling, tlauncher, twilightforest, jei, worldgen, porting, geckolib, continuity, ctm, mipmaps]
 ---
 # Minecraft 26.2 NeoForge modpack audit: diagnostics mod, javac builds, zombie-process and config-loop root causes, measured perf mods
 
@@ -140,3 +140,62 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    "No key type". Mods' own modifiers still work; overriding the list with a no-op `neoforge:add_table` silences it.
 15. Better Village 4.0.0 (26.2) ships a corrupted `desert_meeting_point_3.nbt` (gzip CRC error); the vanilla file
    from the game jar is a drop-in replacement.
+16. Twilight Forest re26 4.8.4208, slow chunk loading in the TF dimension: its biome layer stack (`LazyArea` in front
+   of each pure layer function) caches in a `ConcurrentHashMap` and evicts through a `LinkedBlockingQueue` locked on
+   every miss, so all worldgen threads queue on one lock (profile: 95% of worker time in `LazyArea.getBiome`). A
+   lock-free direct-mapped table of immutable (key, biome) entries (>= 8192 slots, THE_VOID not cached, as upstream)
+   gives the same biomes (every pixel is a function of seed + x/z). Interleaved spectator flights, 90 s: new chunks/s
+   4.0-4.3 -> 9.4-10.7, TPS 8.9 -> 17.6-18.5. A self-check that recomputes cache hits must not re-verify nested layers
+   (ThreadLocal guard) or it grows exponentially; with the guard: 4.35e9 lookups, 0 mismatches.
+17. OptiFine CTM resource packs (here Excalibur 26.3, whose `optifine/ctm/_transitions` overlays are pixel-identical to
+   its 1.12 version) render on NeoForge 26.2 + Sodium 0.9.1 with Continuity 3.0.7+26.2 - but every chunk containing an
+   overlay with `tintIndex=0` + `tintBlock=snow` failed to mesh and the client crashed: 26.2
+   `BlockColors.getTintSource(state, index)` returns null when the block has no tint layer, Continuity's
+   `RenderUtil.getTintColor` dereferences it. A HEAD mixin returning -1 (untinted, what OptiFine does) fixes it.
+   Continuity (like OptiFine) loads CTM `.properties` from ALL packs: a same-path file in a higher pack does not
+   replace the lower one, both rules run. Cost of the transitions here: -11% FPS (interleaved runs).
+18. 26.2 mipmaps: one block sprite whose side is not a multiple of 16 caps the whole block atlas
+   ("dropping miplevel from 4 to 0"); the log only names the sprites at each step down, so scan all
+   `textures/block/**` PNG headers (+ `.mcmeta` frame size). Here 32 sprites in 4 furniture/food mods. Integer
+   nearest-neighbour upscales look identical on models (UVs are fractions); large renders resampled by <2%. Expect the
+   atlas to grow anyway: 26.2 `Stitcher` pads every sprite by `1 << mipLevel` on each side (16x16 -> 48x48), so 4875
+   block sprites went 4096x2048 (mip 0) -> 8192x4096 (mip 4), ~+140 MB VRAM, +7 s to the menu, FPS unchanged, p99 -15%.
+19. Porting 1.21.x mods to 26.2 (YUNG's API 6.1.3 / Ribbits 4.1.4 / NeoBiosphere 1.0.6, javac only): `ResourceLocation`
+   -> `Identifier`; `StructureProcessor` is an interface: `codec()` replaces `getType()`, the
+   `STRUCTURE_PROCESSOR` registry holds MapCodecs (no `StructureProcessorType<T>`), and `StructureTemplate` calls
+   `process(level, pos, refPos, original, processed, settings, template)` - the old `processBlock` arguments plus the
+   template, so bodies port unchanged; `EntityType.X` constants moved to `EntityTypes`; entity `immuneTo` is a block
+   tag; `FriendlyByteBuf.read/writeIdentifier`; `SpawnEggItem.getType(ItemStack)` is static and reads
+   `DataComponents.ENTITY_DATA` (use `Item.Properties.spawnEgg(type)`; ENTITY_TYPE registers before ITEM);
+   `Level.getDayTime()` -> `getOverworldClockTime()`; `FireBlock.setFlammable` is private again (use an `@Invoker`);
+   `ItemBlockRenderTypes` is gone (the chunk layer comes from sprite transparency); `RenderTypes.entityCutout` has cull
+   off (= old `entityCutoutNoCull`); `ItemInHandRenderer.renderArmWithItem` -> `submitArmWithItem`.
+   GeckoLib 5.5 for 26.2 moved to package `com.geckolib`; per-frame bone visibility goes through
+   `GeoRenderer.adjustModelBonesForRender(RenderPassInfo, BoneSnapshots)` + `BoneSnapshot.skipRender/skipChildrenRender`
+   instead of mutating shared `GeoBone`s.
+20. 26.2 data: the `minecraft:random_patch` feature type is gone ("Unknown registry key ... minecraft:random_patch",
+   the whole registry load fails). Vanilla moved patches into placed-feature modifiers; convert
+   tries/xz_spread/y_spread to `count` + `random_offset` with `trapezoid(-s..s, plateau 0)` (old offset was
+   `nextInt(s+1) - nextInt(s+1)`) + the inner feature's filters; the configured feature becomes the inner feature.
+21. Mixins targeting lambdas break silently: YUNG's API raises the jigsaw pool weight cap with a `@WrapOperation` on
+   `lambda$static$1`, but in 26.2 the `Codec.intRange(1, 150)` call sits in `lambda$static$0`; with `require = 0`
+   nothing applies and pools with weights > 150 fail later. A static check of every mixin's target class, method
+   names, `@Shadow`/`@Accessor`/`@Invoker` names and `@At(target)` owners via `javap -p` caught it (and the
+   renamed `ItemInHandRenderer` method) before any lab run.
+22. Overworld-replacing generator (NeoBiosphere-style spheres) without touching other worlds: register a
+   `NoiseBasedChunkGenerator` subclass + a world preset; build its settings at `ChunkMap.<init>` (the only
+   `generatorSettings()` call that creates the `RandomState`) with `finalDensity` wrapped in
+   `rangeChoice(sphereDistance, 0, 1, original, -1e6)`; gate every other mixin (aquifer, heightmap, biome source) on
+   "this level's generator is the sphere generator". Biomes/structures of the pack (Terralith) then appear inside.
+23. Cube Animals 2.1b: `CrocodileLeaveWaterGoal.findLandTarget` (from `canUse`, every 2 ticks per crocodile in water)
+   walks radii 2..16 but rescans the whole (2r+1)^2 square each radius: ~36 000 columns x 6 heights x ~12 block reads
+   when there is no land. 52 crocodiles in a swamp lab world: 86% of the server thread, TPS ~8. Same scan skipping
+   already-checked inner squares (identical result) + a 10-tick retry after a miss: crocodiles 110 -> 3 ms/tick,
+   TPS 20 (self-check vs the original loop: 0 mismatches).
+24. Biome-gated content vs world presets: Terralith's `all_skylands` preset uses only 4 `skylands_*` biomes, so
+   swamp-only structures (Ribbits villages) never generate there. Check the preset's biome list before promising
+   content in an existing world.
+25. Lab screenshots: `Graphics.CopyFromScreen` of the game window's rectangle captures whatever window is on top;
+   `PrintWindow(hwnd, hdc, PW_RENDERFULLCONTENT)` grabs the GL window's own content without stealing focus.
+   A user's screen-share/stream running in the background shifts FPS between sessions by 15-20%: compare FPS only
+   inside one interleaved series.

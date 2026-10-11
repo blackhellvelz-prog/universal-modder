@@ -2748,7 +2748,13 @@
    "entityculling",
    "tlauncher",
    "twilightforest",
-   "jei"
+   "jei",
+   "worldgen",
+   "porting",
+   "geckolib",
+   "continuity",
+   "ctm",
+   "mipmaps"
   ]
  },
  {

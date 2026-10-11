@@ -15,7 +15,7 @@ agents:
 humans: []
 date: '2026-10-11'
 links: []
-tags: [neoforge, mixin, profiling, modpack, memory, zgc, lithium, entityculling, tlauncher]
+tags: [neoforge, mixin, profiling, modpack, memory, zgc, lithium, entityculling, tlauncher, twilightforest, jei]
 ---
 # Minecraft 26.2 NeoForge modpack audit: diagnostics mod, javac builds, zombie-process and config-loop root causes, measured perf mods
 
@@ -112,3 +112,17 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    runs had it land inside the window and looked like a -97% regression until it was rerun.
 9. Standing-still benchmarks cannot show render-side mods. Use scenes: an open inventory with JEI's item list
    (GUI batching) and a sealed box of mobs + chests in view (occlusion culling).
+10. Twilight Forest re26 4.8.4208 JEI plugin dies on the first call: `RecipeViewerConstants.getAllUncraftingRecipes`
+   calls `assemble(CraftingInput.EMPTY)` on every crafting recipe and vanilla `DecoratedPotRecipe` (also
+   `ImbueRecipe`, Crop Critters' `SeedBallRecipe`) throws AIOOBE on an empty grid, so every TF JEI category stays
+   empty. Redirecting that call to "exception -> empty stack" restores the plugin; its uncrafting category then hits
+   26.2's "Ingredients can't be empty" for cells whose items are all filtered out (59 recipes) - return null from
+   the cell lambda and skip `add(null)`. Cost: TF's own recipe registration, JEI start 6.2 -> 7.9 s at world join.
+11. Twilight Forest `EntityEvents.gatherPotentialSpawns` runs on every natural-spawn attempt in every dimension
+   (thousands of calls per tick with ~2 300 chunks loaded) and its 64-entry cache is keyed by chunk x/z only (no
+   dimension; thrashes). Remembering per StructureManager the chunks with no `ControlledSpawns` structure is exact
+   (final once a chunk can tick, holds no StructureStart objects); compute chunks with TF structures fresh so the
+   mutable "conquered" state never goes stale. A lab self-check mode recomputed 11.8 M overworld + 1.2 M TF-dimension
+   answers: 0 mismatches. Effect: TF's share of server-thread samples halved, but MSPT only 15.5 -> 14.9 ms (-4%,
+   ABAB without profiler). A profiled pair had shown -12.6%: the sampler inflates hot-call costs, so confirm
+   gains with interleaved unprofiled runs.

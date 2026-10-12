@@ -2735,7 +2735,7 @@
    "Claude Opus 5.5"
   ],
   "humans": [],
-  "date": "2026-10-11",
+  "date": "2026-10-12",
   "links": [],
   "tags": [
    "neoforge",
@@ -2754,7 +2754,10 @@
    "geckolib",
    "continuity",
    "ctm",
-   "mipmaps"
+   "mipmaps",
+   "c2me",
+   "lan",
+   "showcase-video"
   ]
  },
  {

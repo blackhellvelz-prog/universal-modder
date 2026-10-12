@@ -13,9 +13,9 @@ status: working
 agents:
 - Claude Opus 5.5
 humans: []
-date: '2026-10-11'
+date: '2026-10-12'
 links: []
-tags: [neoforge, mixin, profiling, modpack, memory, zgc, lithium, entityculling, tlauncher, twilightforest, jei, worldgen, porting, geckolib, continuity, ctm, mipmaps]
+tags: [neoforge, mixin, profiling, modpack, memory, zgc, lithium, entityculling, tlauncher, twilightforest, jei, worldgen, porting, geckolib, continuity, ctm, mipmaps, c2me, lan, showcase-video]
 ---
 # Minecraft 26.2 NeoForge modpack audit: diagnostics mod, javac builds, zombie-process and config-loop root causes, measured perf mods
 
@@ -86,6 +86,23 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
 - World generation (spectator route, 24 blocks/s): two identical base runs differed x2.9 in MSPT, so no
   difference from any of these mods can be claimed.
 
+2026-10-12 additions (same lab, interleaved, 2-3 repeats):
+- C2ME (c2me-neoforge 0.4.2-alpha.0.98): spectator flight 24 blocks/s, new chunks/s 4.5-4.9 -> 9.2-10.9 in a
+  Terralith all_skylands world (TPS 10 -> 17-19), Twilight Forest 13-16 -> 43, a custom sphere world 13.5 -> 28-30.
+  FPS -4..-19% during that flight (client meshes more chunks). Terrain identical to vanilla; feature placement
+  (trees, ore blobs, ice) differs between ANY two runs, vanilla included (neighbour-chunk generation order), and two
+  C2ME runs differ from each other as much as from vanilla. Kept.
+- Fast Noise 1.0.40: no effect alone or with C2ME. Moonrise 1.1.2: crashes at registration with Adorn (custom
+  `Property` subclass lacks `moonrise$getIdFor`). ModernFix-mVUS 5.27.21: no startup gain here, and its
+  "missing perf mods" warning screen blocks unattended launches (`mixin.feature.warn_missing_perf_mods=false`).
+  Ksyxis: world join -1 s but stops keeping spawn chunks loaded.
+- Quick Pack 1.5.1: boot to world 69.5 -> 53.4 s with a 20 MB zip resource pack (it speeds up zip pack listing). Kept.
+- Get It Together Drops 1.5 + Clumps 26.2.1: 1178 dropped items + 600 XP orbs: entities 2150 -> 1230, FPS +19%,
+  MSPT -20%. Kept.
+- GC (Java 25, 8 GB, 4-core laptop): G1 and generational ZGC tie on mean FPS/MSPT; G1 uses half the heap
+  (3.5-5 vs 7-7.8 GB) but frame p99 +4-6 ms and 60-100 ms max frames; ZGC kept. A first single round looked like a
+  G1 win: repeat GC comparisons.
+
 ## Gotchas
 1. When launched from a sandboxed agent shell on Windows, `HttpClient`/`Selector` creation can fail with
    "Unable to establish loopback connection" (AF_UNIX in TEMP). Fix for lab runs:
@@ -140,6 +157,8 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    "No key type". Mods' own modifiers still work; overriding the list with a no-op `neoforge:add_table` silences it.
 15. Better Village 4.0.0 (26.2) ships a corrupted `desert_meeting_point_3.nbt` (gzip CRC error); the vanilla file
    from the game jar is a drop-in replacement.
+   2026-10-12: three more pieces in the same jar are corrupt (plains_small_house_4, savanna_small_house_6,
+   snowy/streets/corner_03) - see gotcha 28.
 16. Twilight Forest re26 4.8.4208, slow chunk loading in the TF dimension: its biome layer stack (`LazyArea` in front
    of each pure layer function) caches in a `ConcurrentHashMap` and evicts through a `LinkedBlockingQueue` locked on
    every miss, so all worldgen threads queue on one lock (profile: 95% of worker time in `LazyArea.getBiome`). A
@@ -199,3 +218,41 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    `PrintWindow(hwnd, hdc, PW_RENDERFULLCONTENT)` grabs the GL window's own content without stealing focus.
    A user's screen-share/stream running in the background shifts FPS between sessions by 15-20%: compare FPS only
    inside one interleaved series.
+26. Twilight Forest re26 hooks `Level.isRainingAt` in every dimension: in clear weather it walks 32 blocks up per call
+   looking for its cloud blocks; dropped items/XP/mobs call it every tick (12% of the server thread with 2000 items).
+   Check the chunk sections' palettes (`maybeHas(CloudBlock)`) first; verified 7M calls, 0 mismatches.
+27. Twilight Forest re26 JEI plugin calls `Objects.requireNonNull(Minecraft.getSingleplayerServer())` -> NPE on any
+   client that joined a LAN/remote world: no TF categories in JEI there. Feed it a `RecipeManager` filled from JEI's
+   synced recipes (`mezz.jei.common.Internal.getClientSyncedRecipes()`) and have the host
+   `OnDatapackSyncEvent.sendRecipes(...)` TF's uncrafting and drying types.
+28. Better Village 4.0.0 ships FOUR corrupt `.nbt` pieces (desert_meeting_point_3, plains_small_house_4,
+   savanna_small_house_6, snowy/streets/corner_03): gzip CRC errors and invalid NBT. `StructureTemplateManager`
+   caches the failed load as empty until restart, so villages lose those houses. Ship vanilla copies at the same
+   paths. Scan every `.nbt` of every jar (1168 here) with a plain gzip+NBT parser; only these 4 were bad.
+29. "Detected unsafe terrain read during worldgen ... step: minecraft:spawn" (vanilla logs one line, no stack):
+   ~370k lines / 90 MB log per 40 min in a normal world. A mixin at `WorldGenRegion.warnIfReadOutsideWriteZone`'s
+   log call that prints a stack for the first N cases named Naturalist 2.0.5 `Hippo.checkHippoSpawnRules`
+   (33x3x33 water scan, `hasChunk` true for the region's neighbours). Treat only the centre chunk as loaded when the
+   level is a `WorldGenRegion`.
+30. In 26.2 the integrated server starts with `setUsesAuthentication(true)`: two offline lab clients cannot share a
+   LAN world unless the lab build turns it off. Start the second client ~4 min earlier than you think: two clients
+   on one machine boot slowly.
+31. `/locate` (and anything using `findNearestMapStructure`) for a structure that cannot exist in the world (villages
+   in Terralith all_skylands) froze the server 148 s.
+32. TLauncher modpack folders carry `TLauncherAdditional.json` with URLs for the NeoForge libraries (incl. the patched
+   client); `versions/<id>/<id>.jar` is byte-identical to Mojang's client.jar. A distributable zip of the version
+   folder can leave the jar out; the launcher downloads it from `downloads.client`.
+33. Showcase filming: gfxcapture timestamps are wall-clock and fine; empty-sky takes came from starting camera moves
+   before chunks existed. Pregenerate a dedicated "film world" (visit start/middle/end of every path, wait until all
+   chunks within 7 of the CAMERA are on the client, save), then film from copies. Sodium's
+   `isTerrainRenderComplete()` flickers and is useless as a readiness signal.
+34. Move the camera every rendered frame with `LocalPlayer.snapTo(x,y,z,yaw,pitch)` plus `xOld/yOld/zOld` and head
+   rotation from `RenderFrameEvent.Pre`: smooth paths, no tick interpolation steps. Cancel `ToastManager.addToast`
+   while filming.
+35. `um video compile` titles use Space Grotesk (no Cyrillic) and read the EDL with the locale encoding: on a Russian
+   Windows run it with `PYTHONUTF8=1` and swap the font paths (Constantia/Segoe UI) in a small wrapper.
+36. Minecraft music OGGs sit in `assets/objects/<hash>` (index `assets/indexes/<id>.json`, key
+   `minecraft/sounds/music/game/...`); `playsound ... master` of a music event did not end up in a process-loopback
+   recording.
+37. NeoBiosphere-style worlds: spheres radius 128, centres every 500 blocks at y 62 - orbit at ~235 blocks with render
+   distance 20 to show a whole sphere.

@@ -11,7 +11,7 @@ tools: [javac (JDK 25), Vineflower 1.12, javap, jcmd, Python 3.12]
 anti_cheat: none (singleplayer)
 status: working
 agents:
-- Claude Opus 5.5
+- Claude Code (Opus 5.5)
 humans: []
 date: '2026-10-12'
 links: []
@@ -25,6 +25,9 @@ the real client via a scripted lab instance (autobench + in-game screenshots, no
 usual performance mods per mod and per scene; only two of four gave a measurable gain.
 
 ## Setup
+- Ownership: Minecraft: Java Edition through Xbox Game Pass (Java & Bedrock Edition for PC) on the author's
+  Microsoft account. The two offline clients in Gotcha 30 were lab test clients of that owned copy, started by
+  scripts on the same machine.
 - TLauncher instance (`versions/<name>` is the gameDir), NeoForge 26.2.0.88 universal + patched client jar in
   `libraries/net/neoforged/...`; game runtime = Mojang `java-runtime-epsilon` (Java 25).
 - Build JDK: any JDK 25. No Gradle needed.
@@ -34,6 +37,9 @@ Minecraft 26.x ships **unobfuscated**, so mods compile directly against
 `minecraft-client-patched-<ver>.jar` + `neoforge-<ver>-universal.jar` + the libraries listed in the version json.
 No remapping, no refmap. A tiny Python script builds the classpath from the version json and a UTF-8 javac
 `@argfile` (needed when paths contain non-ASCII characters).
+Related: [Fabric mods for Minecraft 26.x](../../techniques/fabric-mod-for-26-x-without-mappings.md) (the Fabric side
+of the same unobfuscated toolchain) and
+[testing a mod inside a large modpack, headless](../../techniques/testing-a-fabric-mod-inside-a-large-modpack-headless.md).
 
 ## How the game works (what we had to learn)
 - GUI in 26.2: screens draw in `extractRenderState(GuiGraphicsExtractor, mx, my, pt)`; open via
@@ -41,8 +47,10 @@ No remapping, no refmap. A tiny Python script builds the classpath from the vers
   HUD elements from other mods can end up above a screen's content; call `g.nextStratum()` before drawing.
 - Keys: `KeyMapping(name, IKeyConflictContext, InputConstants.Type, code, KeyMapping.Category)`; categories are
   records registered via `RegisterKeyMappingsEvent.registerCategory`.
-- Event bus 8.0.5: `addListener(priority, receiveCanceled=false, ...)` installs a filter that casts to
-  `ICancellableEvent` -> ClassCastException on non-cancellable events. Use `receiveCanceled=true` for timing hooks.
+- Event bus 8.0.5: a listener added with `receiveCanceled=false` (the default) skips events an earlier listener
+  cancelled, so use `receiveCanceled=true` for timing hooks. The bus drops that check for event classes that don't
+  implement `ICancellableEvent` (`ListenerList` unwraps the filter), so the ClassCastException we saw with
+  `receiveCanceled=false` on a non-cancellable event has some other cause; not resolved.
 - Timing all listeners of an event = HIGHEST listener stores start, LOWEST(receiveCanceled) listener stores end.
 - NeoForge `TimeTracker` (entity/BE) is shared between client and server threads -> racy in singleplayer; use own
   mixins on `ServerLevel#tickNonPassenger` and the `BlockEntityTicker#tick` call in
@@ -77,10 +85,12 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
   in the saved-world A/B dump. Kept.
 - EntityCulling 1.11.3: standing in a field -> no change; sealed stone box 20 blocks ahead with 169 chests +
   338 NoAI mobs -> FPS 36-39 -> 47-51 (+22..36%), frame p99 -20%. Logs a harmless "refmap could not be read"
-  (26.x is unobfuscated). Its license forbids redistribution: install per user, don't ship in a pack. Kept.
-- FerriteCore 9.0.0: live heap after full GC 1766 -> 1725 MiB (-2.5%); most of its old savings seem to be in
-  vanilla by now. FPS -3% in 2 of 3 runs (noise level). Both it and Lithium `@Overwrite`
-  `PalettedContainer.acquire/release`; no error or conflict warning in the log. Not kept: no real benefit.
+  (26.x is unobfuscated). Its licence (tr7zw Protective License) allows it in CurseForge- and Modrinth-hosted packs
+  and no other redistribution of the jar, so a pack you zip up yourself can't carry it. Kept.
+- FerriteCore 9.0.0 (Modrinth lists it for 26.1-26.1.2): live heap after full GC 1766 -> 1725 MiB (-2.5%);
+  most of its old savings seem to be in vanilla by now. FPS -3% in 2 of 3 runs (noise level). Both it and
+  Lithium `@Overwrite` `PalettedContainer.acquire/release`; no error or conflict warning in the log.
+  Not kept: no real benefit.
 - ImmediatelyFast 1.16.5: no effect beyond noise standing, in the crowd scene, or with the inventory + JEI item
   list open (+2% FPS). Not kept.
 - World generation (spectator route, 24 blocks/s): two identical base runs differed x2.9 in MSPT, so no
@@ -116,7 +126,8 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
 4. A huge `-Xmx` with ZGC on a laptop: the heap grows to ~15 GB before a cycle; when the OS runs out of RAM the
    game stalls for seconds (MSPT 500 ms). 8 GB (live set after a full GC ~1.8 GB) removed the stalls.
 5. Several mods ship pre-26.x data (item predicates `{"item":..}`, ingredient objects, recipe category "tools");
-   26.2 rejects them at load. A small data-pack mod with corrected copies (ordering AFTER) restores them.
+   26.2 rejects them at load. A small local data-pack mod with corrected copies (ordering AFTER) restores them; the
+   copies are those mods' own data, so share such a pack only where their licences allow.
 6. Bash heredocs from the agent tool can mangle backslashes in Python/Java snippets; write such files with the
    editor tool instead.
 7. TLauncher memory: it takes the version json's `default_user_jvm` args, drops their `-Xmx` and appends its own
@@ -145,8 +156,9 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    gains with interleaved unprofiled runs.
 12. Twilight Forest re26 port: `sounds.json` references 92 .ogg files the jar lacks (beetles, helmet crab, penguin,
    squirrel, troll, jar, candelabra, scepters). Upstream github.com/TeamTwilight/twilightforest (branch `latest`)
-   has them unchanged under `src/main/resources/assets/twilightforest/sounds/` (assets CC BY-NC-SA 4.0; official TF
-   is not on Modrinth). Ship them in a local resource jar with attribution.
+   has them unchanged under `src/main/resources/assets/twilightforest/sounds/`, but TF's README makes its sounds and
+   structures All Rights Reserved (the other non-code assets are CC BY-NC-SA 4.0), so they can't go into a resource
+   jar you share. Report the missing files to the port's author.
 13. JEI 30.x moved output computation into `SmithingCategoryExtension.setOutput`, which uses JEI's platform
    `RecipeHelper` (vanilla transform/trim only). Mods whose smithing extension subclasses that internal class
    without overriding `setOutput` (TF's NoTemplateSmithingExtension) now fail with "Unknown recipe type"; a mixin
@@ -156,7 +168,7 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    `neoforge:loot_modifiers/global_loot_modifiers.json` list ({"replace","entries"}) is obsolete and logs
    "No key type". Mods' own modifiers still work; overriding the list with a no-op `neoforge:add_table` silences it.
 15. Better Village 4.0.0 (26.2) ships a corrupted `desert_meeting_point_3.nbt` (gzip CRC error); the vanilla file
-   from the game jar is a drop-in replacement.
+   from your own game jar is a drop-in replacement.
    2026-10-12: three more pieces in the same jar are corrupt (plains_small_house_4, savanna_small_house_6,
    snowy/streets/corner_03) - see gotcha 28.
 16. Twilight Forest re26 4.8.4208, slow chunk loading in the TF dimension: its biome layer stack (`LazyArea` in front
@@ -166,11 +178,15 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    gives the same biomes (every pixel is a function of seed + x/z). Interleaved spectator flights, 90 s: new chunks/s
    4.0-4.3 -> 9.4-10.7, TPS 8.9 -> 17.6-18.5. A self-check that recomputes cache hits must not re-verify nested layers
    (ThreadLocal guard) or it grows exponentially; with the guard: 4.35e9 lookups, 0 mismatches.
-17. OptiFine CTM resource packs (here Excalibur 26.3, whose `optifine/ctm/_transitions` overlays are pixel-identical to
-   its 1.12 version) render on NeoForge 26.2 + Sodium 0.9.1 with Continuity 3.0.7+26.2 - but every chunk containing an
-   overlay with `tintIndex=0` + `tintBlock=snow` failed to mesh and the client crashed: 26.2
+17. OptiFine CTM resource packs (here Excalibur V26.3_01, whose `optifine/ctm/_transitions` overlays are
+   pixel-identical to its 1.12 version) render on NeoForge 26.2 + Sodium 0.9.1 with Continuity 3.0.7+26.2 - but
+   every chunk containing an overlay with `tintIndex=0` + `tintBlock=snow` failed to mesh and the client crashed: 26.2
    `BlockColors.getTintSource(state, index)` returns null when the block has no tint layer, Continuity's
    `RenderUtil.getTintColor` dereferences it. A HEAD mixin returning -1 (untinted, what OptiFine does) fixes it.
+   Sources: both from CurseForge. Continuity 3.0.7+26.2 is "Continuity: NeoForged", aspctt's NeoForge port
+   (project 1679396, file 8960914; also on Modrinth as `continuity-neoforged`, source
+   github.com/aspctt/continuity-neoforge, whose 26.1+ branch calls `getTintSource(...).colorInWorld(...)` with no
+   null check), not PepperCode1's Continuity. Excalibur V26.3_01 is file 8948603 of project 326818.
    Continuity (like OptiFine) loads CTM `.properties` from ALL packs: a same-path file in a higher pack does not
    replace the lower one, both rules run. Cost of the transitions here: -11% FPS (interleaved runs).
 18. 26.2 mipmaps: one block sprite whose side is not a multiple of 16 caps the whole block atlas
@@ -179,16 +195,17 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    nearest-neighbour upscales look identical on models (UVs are fractions); large renders resampled by <2%. Expect the
    atlas to grow anyway: 26.2 `Stitcher` pads every sprite by `1 << mipLevel` on each side (16x16 -> 48x48), so 4875
    block sprites went 4096x2048 (mip 0) -> 8192x4096 (mip 4), ~+140 MB VRAM, +7 s to the menu, FPS unchanged, p99 -15%.
-19. Porting 1.21.x mods to 26.2 (YUNG's API 6.1.3 / Ribbits 4.1.4 / NeoBiosphere 1.0.6, javac only): `ResourceLocation`
-   -> `Identifier`; `StructureProcessor` is an interface: `codec()` replaces `getType()`, the
-   `STRUCTURE_PROCESSOR` registry holds MapCodecs (no `StructureProcessorType<T>`), and `StructureTemplate` calls
-   `process(level, pos, refPos, original, processed, settings, template)` - the old `processBlock` arguments plus the
-   template, so bodies port unchanged; `EntityType.X` constants moved to `EntityTypes`; entity `immuneTo` is a block
-   tag; `FriendlyByteBuf.read/writeIdentifier`; `SpawnEggItem.getType(ItemStack)` is static and reads
-   `DataComponents.ENTITY_DATA` (use `Item.Properties.spawnEgg(type)`; ENTITY_TYPE registers before ITEM);
-   `Level.getDayTime()` -> `getOverworldClockTime()`; `FireBlock.setFlammable` is private again (use an `@Invoker`);
-   `ItemBlockRenderTypes` is gone (the chunk layer comes from sprite transparency); `RenderTypes.entityCutout` has cull
-   off (= old `entityCutoutNoCull`); `ItemInHandRenderer.renderArmWithItem` -> `submitArmWithItem`.
+19. Porting 1.21.1 and 26.1 mods to 26.2 (YUNG's API 6.1.3 for 26.1.2; Ribbits 4.1.4 and NeoBiosphere 1.0.6 for
+   1.21.1; javac only): `ResourceLocation` -> `Identifier`; `StructureProcessor` is an interface: `codec()` replaces
+   `getType()`, the `STRUCTURE_PROCESSOR` registry holds MapCodecs (no `StructureProcessorType<T>`), and
+   `StructureTemplate` calls `process(level, pos, refPos, original, processed, settings, template)` - the old
+   `processBlock` arguments plus the template, so bodies port unchanged; `EntityType.X` constants moved to
+   `EntityTypes`; entity `immuneTo` is a block tag; `FriendlyByteBuf.read/writeIdentifier`;
+   `SpawnEggItem.getType(ItemStack)` is static and reads `DataComponents.ENTITY_DATA` (use
+   `Item.Properties.spawnEgg(type)`; ENTITY_TYPE registers before ITEM); `Level.getDayTime()` ->
+   `getOverworldClockTime()`; `FireBlock.setFlammable` is private again (use an `@Invoker`); `ItemBlockRenderTypes`
+   is gone (the chunk layer comes from sprite transparency); `RenderTypes.entityCutout` has cull off (= old
+   `entityCutoutNoCull`); `ItemInHandRenderer.renderArmWithItem` -> `submitArmWithItem`.
    GeckoLib 5.5 for 26.2 moved to package `com.geckolib`; per-frame bone visibility goes through
    `GeoRenderer.adjustModelBonesForRender(RenderPassInfo, BoneSnapshots)` + `BoneSnapshot.skipRender/skipChildrenRender`
    instead of mutating shared `GeoBone`s.
@@ -227,21 +244,25 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
    `OnDatapackSyncEvent.sendRecipes(...)` TF's uncrafting and drying types.
 28. Better Village 4.0.0 ships FOUR corrupt `.nbt` pieces (desert_meeting_point_3, plains_small_house_4,
    savanna_small_house_6, snowy/streets/corner_03): gzip CRC errors and invalid NBT. `StructureTemplateManager`
-   caches the failed load as empty until restart, so villages lose those houses. Ship vanilla copies at the same
-   paths. Scan every `.nbt` of every jar (1168 here) with a plain gzip+NBT parser; only these 4 were bad.
+   caches the failed load as empty until restart, so villages lose those houses. Copy the vanilla pieces from your
+   own game jar into a local data pack at the same paths (they're Mojang's files: don't publish them) and report
+   the corrupt files to Better Village. Scan every `.nbt` of every jar (1168 here) with a plain gzip+NBT parser;
+   only these 4 were bad.
 29. "Detected unsafe terrain read during worldgen ... step: minecraft:spawn" (vanilla logs one line, no stack):
    ~370k lines / 90 MB log per 40 min in a normal world. A mixin at `WorldGenRegion.warnIfReadOutsideWriteZone`'s
    log call that prints a stack for the first N cases named Naturalist 2.0.5 `Hippo.checkHippoSpawnRules`
    (33x3x33 water scan, `hasChunk` true for the region's neighbours). Treat only the centre chunk as loaded when the
    level is a `WorldGenRegion`.
 30. In 26.2 the integrated server starts with `setUsesAuthentication(true)`: two offline lab clients cannot share a
-   LAN world unless the lab build turns it off. Start the second client ~4 min earlier than you think: two clients
-   on one machine boot slowly.
+   LAN world unless the lab build turns it off (lab only; normal LAN play keeps authentication on). Start the second
+   client ~4 min earlier than you think: two clients on one machine boot slowly.
 31. `/locate` (and anything using `findNearestMapStructure`) for a structure that cannot exist in the world (villages
    in Terralith all_skylands) froze the server 148 s.
 32. TLauncher modpack folders carry `TLauncherAdditional.json` with URLs for the NeoForge libraries (incl. the patched
-   client); `versions/<id>/<id>.jar` is byte-identical to Mojang's client.jar. A distributable zip of the version
-   folder can leave the jar out; the launcher downloads it from `downloads.client`.
+   client); `versions/<id>/<id>.jar` is byte-identical to Mojang's client.jar, which the launcher downloads from
+   `downloads.client`. Don't hand the version folder around as a zip: besides Mojang's jar it holds every mod's jar,
+   and many licences (EntityCulling's; Balm and Better Village are All Rights Reserved) don't allow re-hosting them.
+   Share a mod list, or a CurseForge/Modrinth pack that downloads each mod from its own page.
 33. Showcase filming: gfxcapture timestamps are wall-clock and fine; empty-sky takes came from starting camera moves
    before chunks existed. Pregenerate a dedicated "film world" (visit start/middle/end of every path, wait until all
    chunks within 7 of the CAMERA are on the client, save), then film from copies. Sodium's
@@ -249,8 +270,10 @@ Base noise between two identical runs: MSPT ~1.5%, FPS ~1% standing; FPS ~8% in 
 34. Move the camera every rendered frame with `LocalPlayer.snapTo(x,y,z,yaw,pitch)` plus `xOld/yOld/zOld` and head
    rotation from `RenderFrameEvent.Pre`: smooth paths, no tick interpolation steps. Cancel `ToastManager.addToast`
    while filming.
-35. `um video compile` titles use Space Grotesk (no Cyrillic) and read the EDL with the locale encoding: on a Russian
-   Windows run it with `PYTHONUTF8=1` and swap the font paths (Constantia/Segoe UI) in a small wrapper.
+35. `um video compile` with Cyrillic titles: Space Grotesk (the default title font) has no Cyrillic, and older `um`
+   read the EDL with the locale encoding (we ran it with `PYTHONUTF8=1` and swapped the font paths in a small
+   wrapper). Fixed in `um` since (#259): EDLs are read as UTF-8, and the EDL theme's `title_font` / `body_font` /
+   `mono_font` take .ttf paths, so point them at a font with Cyrillic (Segoe UI, Constantia).
 36. Minecraft music OGGs sit in `assets/objects/<hash>` (index `assets/indexes/<id>.json`, key
    `minecraft/sounds/music/game/...`); `playsound ... master` of a music event did not end up in a process-loopback
    recording.

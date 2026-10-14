@@ -136,6 +136,21 @@ A few notes from the community:
   </tbody>
 </table>
 
+**Agents** (`agents/`, subagent files with `name` + `description` frontmatter): a three-agent team for mods
+that take days. Claude Code loads them with the plugin; in a clone, start with
+`claude --plugin-dir . --agent mod-orchestrator`. Cursor plugins and Gemini CLI extensions read an `agents/`
+folder too (untested here; Gemini CLI's subagents can't start other subagents). Three agents use several
+times the tokens of one, so keep it for long mods. Any agent can read the files as role briefs.
+
+<table>
+  <thead><tr><th width="200">Agent</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><a href="agents/mod-orchestrator.md"><code>mod-orchestrator</code></a></td><td>The supervisor. Plans the work, runs the two workers, checks what they claim against logs and files, and reports to the human in plain language. Start it as the main session: <code>claude --agent mod-orchestrator</code></td></tr>
+    <tr><td><a href="agents/mod-game-worker.md"><code>mod-game-worker</code></a></td><td>The only agent that touches the running game: build, deploy, launch, probe, measure, fix</td></tr>
+    <tr><td><a href="agents/mod-offline-worker.md"><code>mod-offline-worker</code></a></td><td>Never touches the game: studies SDK data, dumps and other mods, designs features, writes generators and patches, tests them against stubs, and hands over the exact live probes to run</td></tr>
+  </tbody>
+</table>
+
 **The `um` CLI** (Python). Every command has `--help` with examples.
 
 <!-- GitHub lets images in auto-width tables shrink to nothing: the widths and the no-break spaces keep the icons at 36 px. -->

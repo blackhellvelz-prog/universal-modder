@@ -43,6 +43,53 @@
   ]
  },
  {
+  "path": "games/age-of-mythology-retold/warcraft-iii-races-and-campaigns-as-a-data-mod-for-age-of-my.md",
+  "kind": "game",
+  "title": "Warcraft III races and campaigns as a data mod for Age of Mythology: Retold",
+  "game": "Age of Mythology: Retold",
+  "games_also": [
+   "Warcraft III"
+  ],
+  "game_version": "AoM: Retold v100.19.17020 (Steam, October 2026); Warcraft III Reforged 3.0.0.24268 (CASC, SD models)",
+  "platform": "windows",
+  "engine": "native",
+  "route": "data",
+  "tools": [
+   "CryBar.Cli 1.3.20",
+   "stormex 2.2.0",
+   "Blender 5.2",
+   "Python 3.12 (own MDX reader and MDX-to-glTF converter)",
+   "um win launch"
+  ],
+  "anti_cheat": "none for skirmish and single-player campaigns; personal mod, multiplayer never used",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [
+   "knowledge/techniques/converting-warcraft-iii-reforged-sd-models-mdx-v1800-to-skin.md",
+   "https://github.com/CryShana/CryBarEditor",
+   "https://github.com/Talv/stormex"
+  ],
+  "tags": [
+   "total-conversion",
+   "data-mod",
+   "culture",
+   "civilization",
+   "campaign",
+   "scenario-triggers",
+   "xs",
+   "cinematics",
+   "model-conversion",
+   "tmm",
+   "tma",
+   "manifest-limit",
+   "mdx"
+  ]
+ },
+ {
   "path": "games/assassin-s-creed/community-modding-toolkit-and-prior-art-across-the-assassin-.md",
   "kind": "game",
   "title": "Community modding toolkit and prior art across the Assassin's Creed family (Anvil / AnvilNext)",
@@ -1041,6 +1088,43 @@
   ]
  },
  {
+  "path": "games/crash-bandicoot-n-sane-trilogy/uncapped-fps-and-live-boss-powers.md",
+  "kind": "game",
+  "title": "Crash N. Sane: uncapped frame rate and Crash 3's boss powers in Crash 1 and 2, live",
+  "game": "Crash Bandicoot N. Sane Trilogy",
+  "games_also": [],
+  "game_version": "Steam 731490, exe PE timestamp 2018-07-19 (sha256 170c61d3...6af3)",
+  "platform": "windows",
+  "engine": "native",
+  "route": "native-hook",
+  "tools": [
+   "ReShade 6.8.0 add-on build",
+   "MSVC 14.44",
+   "Python 3.10 + numpy (ReadProcessMemory probes)",
+   "Pillow"
+  ],
+  "anti_cheat": "none (Steam exe is SteamStub-wrapped; only the running process was touched, after start-up)",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [
+   "croc-inside-crash-n-sane-live-two-engine-mashup.md"
+  ],
+  "tags": [
+   "alchemy-engine",
+   "reshade-addon",
+   "frame-rate",
+   "timer-resolution",
+   "game-variables",
+   "save-progress",
+   "d3d11",
+   "overlay-ui"
+  ]
+ },
+ {
   "path": "games/crysis-warhead/black-ops-zombies-native-animation-and-runtime.md",
   "kind": "game",
   "title": "Black Ops Zombies in Warhead: native viewmodels, reload accounting, materials and bounded tests",
@@ -1710,6 +1794,46 @@
    "matbin",
    "spirit-summons",
    "retexture"
+  ]
+ },
+ {
+  "path": "games/etrian-odyssey-2-hd/etria-inside-eo2-bepinex-protected-il2cpp.md",
+  "kind": "game",
+  "title": "Etrian Odyssey 1's labyrinth and battles running inside Etrian Odyssey 2 HD (BepInEx on a protected IL2CPP build)",
+  "game": "Etrian Odyssey II HD",
+  "games_also": [
+   "Etrian Odyssey HD"
+  ],
+  "game_version": "Steam builds of Oct 2026 (EO2 app 1868170, EO1 app 1868180), Unity 2020.3.1f1, IL2CPP",
+  "platform": "windows",
+  "engine": "unity-il2cpp",
+  "route": "managed-patch",
+  "tools": [
+   "BepInEx 6.0.0-be.788 (Unity.IL2CPP win-x64)",
+   "Il2CppInterop 1.5.3 (patched)",
+   "Il2CppDumper 6.7.46",
+   ".NET 8 SDK",
+   "Harmony"
+  ],
+  "anti_cheat": "none (single-player). Both games ship with Denuvo (Steam store DRM notice); it stays in place and is never unpacked or removed. The lab copy runs with steam_appid.txt through the owning Steam account",
+  "status": "in-progress",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-12",
+  "links": [],
+  "tags": [
+   "bepinex",
+   "il2cpp",
+   "protected-gameassembly",
+   "denuvo",
+   "il2cppinterop",
+   "addressables",
+   "cross-game",
+   "mashup",
+   "harmony",
+   "save-redirect"
   ]
  },
  {
@@ -2437,24 +2561,28 @@
    "Gibbed.JustCause3.SmallPack",
    "Gibbed.JustCause3.ConvertAdf",
    "Gibbed.JustCause3.ConvertProperty",
+   "Gibbed.JustCause3.ConvertTexture",
    "Gibbed.HashName",
-   "custom Python RBM codec + PSKX importer (see Build steps)"
+   "Blender 5.2 (headless decimation)",
+   "custom Python RBM codec, PSKX importer, BC1/BC5 encoder, .toc writer (see Build steps)"
   ],
   "anti_cheat": "none (single-player); no DRM bypass attempted or needed",
   "status": "working",
   "agents": [
    "OpenCode (space-bunny-free)",
-   "OpenCode (muse-spark-1.3)"
+   "OpenCode (muse-spark-1.3)",
+   "Claude Code (Opus 5.5)"
   ],
   "humans": [
    "@NotTrevino"
   ],
-  "date": "2026-10-11",
+  "date": "2026-10-12",
   "links": [
    "https://github.com/aaronkirkham/jc-model-renderer",
    "https://github.com/aaronkirkham/ava-format-lib",
    "https://github.com/aaronkirkham/jc3-console-thingy",
    "https://github.com/Brooen/RBM-Exporter",
+   "https://github.com/PredatorCZ/ApexToolset",
    "https://videogamemods.com/vgm/justcause3/mods/meme-vehicle-pack",
    "https://videogamemods.com/u/lukejc3mp-0021"
   ],
@@ -2468,7 +2596,11 @@
    "reverse-engineering",
    "toc",
    "palette",
-   "pskx-pipeline"
+   "pskx-pipeline",
+   "textures",
+   "materials",
+   "memory-budget",
+   "physics-stations"
   ]
  },
  {
@@ -3081,6 +3213,54 @@
    "gametest",
    "rcon",
    "headless-verification"
+  ]
+ },
+ {
+  "path": "games/minecraft/neoforge-26-2-modpack-audit-perf-mods.md",
+  "kind": "game",
+  "title": "Minecraft 26.2 NeoForge modpack audit: diagnostics mod, javac builds, zombie-process and config-loop root causes, measured perf mods",
+  "game": "Minecraft",
+  "games_also": [],
+  "game_version": "26.2 (NeoForge 26.2.0.88, FML 11.0.16, Java 25)",
+  "platform": "windows",
+  "engine": "java",
+  "route": "managed-patch",
+  "tools": [
+   "javac (JDK 25)",
+   "Vineflower 1.12",
+   "javap",
+   "jcmd",
+   "Python 3.12"
+  ],
+  "anti_cheat": "none (singleplayer)",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-12",
+  "links": [],
+  "tags": [
+   "neoforge",
+   "mixin",
+   "profiling",
+   "modpack",
+   "memory",
+   "zgc",
+   "lithium",
+   "entityculling",
+   "tlauncher",
+   "twilightforest",
+   "jei",
+   "worldgen",
+   "porting",
+   "geckolib",
+   "continuity",
+   "ctm",
+   "mipmaps",
+   "c2me",
+   "lan",
+   "showcase-video"
   ]
  },
  {
@@ -3998,50 +4178,42 @@
   ]
  },
  {
-  "path": "games/sid-meier-s-civilization-v/new-civ-animated-3d-leader-scene.md",
+  "path": "games/schedule-i/shadow-of-mordor-nemesis-system.md",
   "kind": "game",
-  "title": "A new civilization with an animated 3D leader scene on a stock leader rig in Civilization V",
-  "game": "Sid Meier's Civilization V",
-  "games_also": [],
-  "game_version": "1.0.3.279 (final patch), Brave New World, Steam app 8930, Windows 11; DX9 and DX11 renderers",
-  "platform": "windows",
-  "engine": "native",
-  "route": "data",
-  "tools": [
-   "Civilization V SDK (CvGameCoreSource, Nexus Firaxis.Framework.Granny DLLs)",
-   "gr2tool (custom C# on the SDK's Granny wrappers, x86 + x64 builds)",
-   "Blender 5.2",
-   "Python (numpy, pillow, lupa)",
-   "xatlas",
-   "ffmpeg",
-   "um win (launch/shot/drive/record)"
+  "title": "Shadow of Mordor Nemesis system across Cartel and Police factions in Schedule I",
+  "game": "Schedule I",
+  "games_also": [
+   "Middle-earth: Shadow of Mordor"
   ],
-  "anti_cheat": "none; all testing single-player",
-  "status": "released",
+  "game_version": "0.4.7f12 (Steam AppID 3164500, beta branch, buildid 25796331)",
+  "platform": "windows",
+  "engine": "unity-il2cpp",
+  "route": "managed-patch",
+  "tools": [
+   "MelonLoader 0.7.3",
+   "HarmonyX",
+   "ilspycmd 11.1",
+   ".NET SDK 10 (targeting net6.0)"
+  ],
+  "anti_cheat": "none found; co-op is FishNet over Steam P2P. Single player or a lobby you host with friends who agreed; never someone else's lobby",
+  "status": "in-progress",
   "agents": [
-   "Claude Code (Opus 5.5)"
+   "Gemini CLI (gemini-3.8-flash)"
   ],
   "humans": [
-   "@blackhellvelz-prog"
+   "SyronAscalon"
   ],
-  "date": "2026-10-06",
-  "links": [
-   "https://steamcommunity.com/sharedfiles/filedetails/?id=3814750314"
-  ],
+  "date": "2026-10-13",
+  "links": [],
   "tags": [
-   "civilization",
-   "steam-workshop",
-   "leaderhead",
-   "granny",
-   "gr2",
-   "animation-retargeting",
-   "light-rig",
-   "dx11",
-   "lua",
-   "xml",
-   "sql",
-   "sound",
-   "ui"
+   "nemesis-system",
+   "il2cpp",
+   "melonloader",
+   "harmony",
+   "ai-factions",
+   "persistence",
+   "imgui",
+   "mechanic-port"
   ]
  },
  {
@@ -4952,7 +5124,7 @@
   "title": "Seamless co-op for TUNIC (BepInEx 6 IL2CPP, native hooks, autonomous 2-PC testing)",
   "game": "TUNIC",
   "games_also": [],
-  "game_version": "Unity 2020.3.17f1, IL2CPP (steam 553420, build current Oct 2026)",
+  "game_version": "Unity 2020.3.17f1, IL2CPP (Steam 553420, build id 10650562)",
   "platform": "windows",
   "engine": "unity-il2cpp",
   "route": "native-hook",
@@ -4965,7 +5137,7 @@
   "anti_cheat": "none found by um scan",
   "status": "working",
   "agents": [
-   "Claude (Opus 5.5)"
+   "Claude Code (Opus 5.5)"
   ],
   "humans": [
    "Freddy"
@@ -4973,7 +5145,8 @@
   "date": "2026-10-12",
   "links": [
    "https://github.com/BepInEx/BepInEx/releases/tag/v6.0.0-pre.1",
-   "https://github.com/silent-destroyer/tunic-randomizer"
+   "https://github.com/silent-destroyer/tunic-randomizer",
+   "https://github.com/AfroPK/tunic-seamless-coop"
   ],
   "tags": [
    "co-op",
@@ -4981,6 +5154,8 @@
    "netcode",
    "il2cpp",
    "native-hook",
+   "harmony",
+   "bosses",
    "autopilot",
    "automated-testing"
   ]
@@ -5097,6 +5272,301 @@
    "dds",
    "procedural-art",
    "crash-debugging"
+  ]
+ },
+ {
+  "path": "games/warhammer-40-000-space-marine-2/sm2-missions-scenarios-faction-swaps-and-esd-spawning.md",
+  "kind": "game",
+  "title": "Space Marine 2 missions: scenario faction swaps, level files, the ESD spawn director and rebaking a navmesh with spawn points",
+  "game": "Warhammer 40,000: Space Marine 2",
+  "games_also": [],
+  "game_version": "Steam build 25799387 (Patch 15.1, Oct 2026); faction swap on Patch 14.x (Sep 2026). Mod Tools app 3856330 build 25506153 (AIConverter, Furnace, MapBuilder)",
+  "platform": "windows",
+  "engine": "unknown",
+  "route": "data",
+  "tools": [
+   "Saber SM2 Mod Tools (ModEditor, AIConverterExe, furnace.exe, ModelConverter --map_mode)",
+   "Python 3 (struct, zipfile)",
+   "own cd_list / class_list readers-writers (ports of Saber's shipped C# source)",
+   "own ctypes debugger for Saber's offline tools",
+   "own sslbin disassembler"
+  ],
+  "anti_cheat": "EasyAntiCheat. Everything here uses Saber's official mods folder (client_pc/root/mods), which flags the session 'Mods Detected' (private lobbies, separate progression). No injection, no EAC interaction, PvE only. The debugger was only ever attached to Saber's offline converters, never the game.",
+  "status": "in-progress",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [],
+  "tags": [
+   "space-marine-2",
+   "saber",
+   "scenario",
+   "mission",
+   "faction-swap",
+   "tyranids",
+   "chaos",
+   "esd",
+   "spawn-director",
+   "navmesh",
+   "aiconverter",
+   "furnace",
+   "cd-list",
+   "class-list",
+   "level",
+   "lobby"
+  ]
+ },
+ {
+  "path": "games/warhammer-40-000-space-marine-2/sm2-modding-foundations-paks-tools-and-crash-triage.md",
+  "kind": "game",
+  "title": "Space Marine 2 modding foundations: paks, load order, Saber's tools, manifests and crash triage",
+  "game": "Warhammer 40,000: Space Marine 2",
+  "games_also": [],
+  "game_version": "Steam build 25799387 (Patch 15.1, Oct 2026); earlier findings on Patch 14.x (Aug-Sep 2026). Mod Tools app 3856330 build 25506153 (Oct 2026 update)",
+  "platform": "windows",
+  "engine": "unknown",
+  "route": "data",
+  "tools": [
+   "Saber SM2 Mod Tools (ModEditor, ModelConverter, UsfExporter, Meta Desc Patcher)",
+   "Python 3 (zipfile, struct)",
+   "own minidump / .ssldmp readers"
+  ],
+  "anti_cheat": "EasyAntiCheat. Everything here uses Saber's official mods folder (client_pc/root/mods), which flags the session 'Mods Detected' (private lobbies, separate progression). No injection, no EAC interaction, PvE only.",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [
+   "https://spacemarine2-modding.prismray.io/"
+  ],
+  "tags": [
+   "space-marine-2",
+   "saber",
+   "swarm-engine",
+   "pak",
+   "load-order",
+   "ssl",
+   "sso",
+   "crash-triage",
+   "mod-tools"
+  ]
+ },
+ {
+  "path": "games/warhammer-40-000-space-marine-2/sm2-models-tpl-format-modelconverter-and-textures.md",
+  "kind": "game",
+  "title": "Space Marine 2 models and textures: the .tpl format, Saber's converter round trip, the shader cache and custom meshes",
+  "game": "Warhammer 40,000: Space Marine 2",
+  "games_also": [],
+  "game_version": "Steam build 25799387 (Patch 15.1, Oct 2026); most findings on Patch 14.x (Aug-Oct 2026). Mod Tools app 3856330 build 25506153 (ModelConverter v13/v14, UsfExporter, TextureConverter)",
+  "platform": "windows",
+  "engine": "unknown",
+  "route": "asset-only",
+  "tools": [
+   "Saber SM2 Mod Tools (ModelConverter, UsfExporter convert_tpl.py, TextureConverter)",
+   "Python 3 (numpy, scipy, struct)",
+   "pymeshlab (Python 3.12)",
+   "xatlas",
+   "texture2ddecoder",
+   "Blender (previews only)"
+  ],
+  "anti_cheat": "EasyAntiCheat. Everything here uses Saber's official mods folder (client_pc/root/mods), which flags the session 'Mods Detected' (private lobbies, separate progression). No injection, no EAC interaction, PvE only.",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [],
+  "tags": [
+   "space-marine-2",
+   "saber",
+   "swarm-engine",
+   "tpl",
+   "gltf",
+   "modelconverter",
+   "usfexport",
+   "shader-cache",
+   "textures",
+   "pct",
+   "constructor",
+   "armour",
+   "custom-head",
+   "ai-mesh",
+   "collision",
+   "cloth"
+  ]
+ },
+ {
+  "path": "games/warhammer-40-000-space-marine-2/sm2-new-enemies-npc-classes-and-morpheme-animation.md",
+  "kind": "game",
+  "title": "Space Marine 2 new enemies: NPC classes, cloned Morpheme networks, .sani clips, retargeting and executions",
+  "game": "Warhammer 40,000: Space Marine 2",
+  "games_also": [],
+  "game_version": "Steam build 25799387 (Patch 15.1, Oct 2026); most findings on Patch 14.x (Sep-Oct 2026). Mod Tools app 3856330 build 25506153",
+  "platform": "windows",
+  "engine": "unknown",
+  "route": "data",
+  "tools": [
+   "Saber SM2 Mod Tools (ModEditor, ModelConverter, UsfExporter)",
+   "Python 3 (numpy, scipy, struct, zlib crc32)",
+   "own .sani reader/writer",
+   "own Morpheme .nmb asset/string-table patcher",
+   "Blender + three.js viewer (previews)",
+   "pymeshlab"
+  ],
+  "anti_cheat": "EasyAntiCheat. Everything here uses Saber's official mods folder (client_pc/root/mods), which flags the session 'Mods Detected' (private lobbies, separate progression). No injection, no EAC interaction, PvE only.",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [],
+  "tags": [
+   "space-marine-2",
+   "saber",
+   "npc",
+   "enemy",
+   "boss",
+   "tyranid",
+   "morpheme",
+   "nmb",
+   "sani",
+   "animation",
+   "retarget",
+   "finisher",
+   "execution",
+   "interplay",
+   "xseq",
+   "spawning"
+  ]
+ },
+ {
+  "path": "games/warhammer-40-000-space-marine-2/sm2-new-playable-class-on-character-mod-slot.md",
+  "kind": "game",
+  "title": "A new playable class in Space Marine 2 on Saber's CHARACTER_MOD slot (a Chaplain)",
+  "game": "Warhammer 40,000: Space Marine 2",
+  "games_also": [],
+  "game_version": "Steam build 25799387 (Patch 15.1, Oct 2026); class first built on Patch 14.x (Sep 2026) and rebased onto Patch 15",
+  "platform": "windows",
+  "engine": "unknown",
+  "route": "data",
+  "tools": [
+   "Saber SM2 Mod Tools (ModEditor, ModelConverter, UsfExporter)",
+   "Python 3 (zipfile, own SSL text parser for 3-way merges)"
+  ],
+  "anti_cheat": "EasyAntiCheat. Everything here uses Saber's official mods folder (client_pc/root/mods), which flags the session 'Mods Detected' (private lobbies, separate progression). No injection, no EAC interaction, PvE only.",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-14",
+  "links": [],
+  "tags": [
+   "space-marine-2",
+   "saber",
+   "new-class",
+   "character-mod",
+   "chaplain",
+   "mastery",
+   "perks",
+   "armoury",
+   "talker",
+   "constructor"
+  ]
+ },
+ {
+  "path": "games/warhammer-40-000-space-marine-2/sm2-voices-talkers-and-wwise-audio.md",
+  "kind": "game",
+  "title": "Space Marine 2 voices: custom talkers, mission voice routes, media bundles, Wwise bank edits and grunt matching",
+  "game": "Warhammer 40,000: Space Marine 2",
+  "games_also": [],
+  "game_version": "Steam build 25799387 (Patch 15.1, Oct 2026); earlier findings on Patch 14.x (Sep-Oct 2026). Wwise 2019.2 for encoding",
+  "platform": "windows",
+  "engine": "unknown",
+  "route": "data",
+  "tools": [
+   "Wwise 2019.2 (WwiseConsole, conversion matching the game's mono voice preset)",
+   "wwiser (bank dumps)",
+   "ww2ogg + revorb (extraction)",
+   "ffmpeg",
+   "Python 3 (struct, numpy; own bank and bundle writers)",
+   "AI text-to-speech (ElevenLabs) for new lines"
+  ],
+  "anti_cheat": "EasyAntiCheat. Everything here uses Saber's official mods folder (client_pc/root/mods), which flags the session 'Mods Detected' (private lobbies, separate progression). No injection, no EAC interaction, PvE only.",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [],
+  "tags": [
+   "space-marine-2",
+   "saber",
+   "voice",
+   "vo",
+   "talker",
+   "wwise",
+   "bnk",
+   "wem",
+   "media-bundle",
+   "subtitles",
+   "grunts",
+   "audio",
+   "chatter"
+  ]
+ },
+ {
+  "path": "games/warhammer-40-000-space-marine-2/sm2-weapons-skins-reloads-perks-vfx-and-sounds.md",
+  "kind": "game",
+  "title": "Space Marine 2 weapons: skins, new melee weapons, reload and hip-fire animations, perks, VFX, sounds and crosshairs",
+  "game": "Warhammer 40,000: Space Marine 2",
+  "games_also": [],
+  "game_version": "Steam build 25799387 (Patch 15.1, Oct 2026); earlier findings on Patch 14.x (Aug-Oct 2026). Mod Tools app 3856330 build 25506153",
+  "platform": "windows",
+  "engine": "unknown",
+  "route": "data",
+  "tools": [
+   "Saber SM2 Mod Tools (ModEditor, ModelConverter, UsfExporter)",
+   "Python 3 (zipfile, struct, numpy)",
+   "own Morpheme .nmb network reader/patcher",
+   "own .sani clip codec",
+   "own sslbin disassembler",
+   "own Wwise bank reader/writer"
+  ],
+  "anti_cheat": "EasyAntiCheat. Everything here uses Saber's official mods folder (client_pc/root/mods), which flags the session 'Mods Detected' (private lobbies, separate progression). No injection, no EAC interaction, PvE only.",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [],
+  "tags": [
+   "space-marine-2",
+   "saber",
+   "weapons",
+   "weapon-skin",
+   "melee",
+   "firearm",
+   "reload",
+   "active-reload",
+   "morpheme",
+   "animation-network",
+   "perks",
+   "damage",
+   "burning",
+   "vfx",
+   "sound",
+   "crosshair",
+   "hud",
+   "equipment"
   ]
  },
  {
@@ -5259,6 +5729,53 @@
    "lua",
    "nexustools",
    "measurement"
+  ]
+ },
+ {
+  "path": "games/white-knuckle/climbing-movement-and-damage-look-in-minecraft-fabric.md",
+  "kind": "game",
+  "title": "White Knuckle's climbing, movement and damage look as a Minecraft 1.21.9 Fabric mod, from your own install",
+  "game": "White Knuckle",
+  "games_also": [
+   "Minecraft Java Edition"
+  ],
+  "game_version": "White Knuckle Steam build 25612096 (Unity 6000.3.9f1, Mono, D3D11/D3D12), run on Linux through Proton Experimental; Minecraft Java 1.21.9 with Fabric Loader 0.19.5, Fabric API 0.134.1+1.21.9",
+  "platform": "proton",
+  "engine": "unity-mono",
+  "route": "reimplementation",
+  "tools": [
+   "Fabric (Loom 1.12.7, Gradle 9.1, Mojang mappings, JDK 25)",
+   "ilspycmd 8.2.0.7535 on .NET 8",
+   "UnityPy + TypeTreeGeneratorAPI",
+   "vkd3d-compiler.exe (Fedora mingw64-vkd3d) under Wine",
+   "Python 3.10-3.14"
+  ],
+  "anti_cheat": "none: White Knuckle is single-player and is never modified; only its files are read. Minecraft side tested in single-player, LAN and a Fabric dedicated server.",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-14",
+  "links": [
+   "https://github.com/Fizz12215/White-Knuckle-Climbing"
+  ],
+  "tags": [
+   "white-knuckle",
+   "unity",
+   "unity-6",
+   "minecraft",
+   "fabric",
+   "climbing",
+   "physics-port",
+   "shader-disassembly",
+   "dxbc",
+   "fsb5",
+   "ima-adpcm",
+   "fmod",
+   "proton",
+   "kde-wayland",
+   "reference-capture"
   ]
  },
  {
@@ -6117,6 +6634,32 @@
   ]
  },
  {
+  "path": "techniques/converting-warcraft-iii-reforged-sd-models-mdx-v1800-to-skin.md",
+  "kind": "technique",
+  "title": "Converting Warcraft III Reforged SD models (MDX v1800) to skinned glTF",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-13",
+  "links": [
+   "knowledge/games/age-of-mythology-retold/warcraft-iii-races-and-campaigns-as-a-data-mod-for-age-of-my.md"
+  ],
+  "tags": [
+   "mdx",
+   "warcraft-iii",
+   "reforged",
+   "casc",
+   "stormex",
+   "gltf",
+   "skinning",
+   "skeletal-animation",
+   "model-conversion",
+   "team-colour"
+  ]
+ },
+ {
   "path": "techniques/d3d12-frame-readback-buffers-only.md",
   "kind": "technique",
   "title": "D3D12 frame readback: buffers only",
@@ -6405,9 +6948,10 @@
    "crash-reporter",
    "safety",
    "online-guard",
-   "dpi-scaling"
+   "dpi-scaling",
+   "menu-navigation"
   ],
-  "date": "2026-10-01",
+  "date": "2026-10-12",
   "agents": [
    "Claude Code (Opus 5.5)"
   ],

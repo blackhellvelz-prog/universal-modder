@@ -3103,7 +3103,7 @@
   "anti_cheat": "none (singleplayer)",
   "status": "working",
   "agents": [
-   "Claude Opus 5.5"
+   "Claude Code (Opus 5.5)"
   ],
   "humans": [],
   "date": "2026-10-12",

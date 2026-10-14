@@ -220,7 +220,9 @@ A **data mod**: XML/SQL for the database, Lua addins for the gameplay, and art l
 - **Not verified:**
   - multiplayer;
   - the Tablet exe;
-  - DX9 at max settings after the last lighting change.
+  - DX9 at max settings after the last lighting change;
+  - a game without the Babylon DLC, where Nebuchadnezzar's rig, animations and voice come from (the Workshop page
+    says the mod was tested only with it).
 
 ## Gotchas
 1. **Scene fine on DX9, mostly black at max settings.**
@@ -302,7 +304,8 @@ A **data mod**: XML/SQL for the database, Lua addins for the gameplay, and art l
 20. **`SteamAPI_Init` fails while Steam is running.**
     - **Cause:** the SDK's old `steam_api.dll` checks `HKCU\Software\Valve\Steam\ActiveProcess\pid`, and the
       value was a dead pid.
-    - **Fix:** point it at the running `steam.exe` (Steam rewrites it on its next start).
+    - **Fix:** point it at the running `steam.exe` (Steam rewrites it on its next start). That's a registry write,
+      so ask the human first.
 21. **`SubscribePublishedFile` returns Fail.**
     - **Cause:** subscriptions belong to the game's app; we called it from the SDK's (16830).
     - **Fix:** run the call with `steam_appid.txt` = 8930.
@@ -321,6 +324,11 @@ A **data mod**: XML/SQL for the database, Lua addins for the gameplay, and art l
 - **How we treated the models:** never decimated. Re-unwrapped and re-baked where their atlases were unusable.
 - **Voice:** the stock leader's lines through ffmpeg: slowed with `asetrate`, a rubberband sub-voice, bass, and a short
   echo. The animations were stretched by the same factor so the mouth stays in sync.
+- **Derived from the game's files, and in the released package:** Nebuchadnezzar's 39 animations (retimed and
+  edited), his voice lines (slowed and processed), and copies of stock `.gr2` files, light and camera rigs and cube
+  maps with our content swapped in. None of it is in this repo. Before releasing something similar, read the game's
+  mod terms, and reference stock files by name wherever the game allows it (unit animations, for example, are found
+  by name in the game's packages).
 
 ## Cost and time
 About four days of agent sessions over the whole mod. The animated leader alone took two (retargeting, voice,

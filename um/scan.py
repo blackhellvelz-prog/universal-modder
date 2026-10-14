@@ -16,6 +16,7 @@ import re
 import struct
 import subprocess
 import time
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from um.common import die, is_mac, is_windows, is_wsl, ps_exe, to_posix
@@ -366,7 +367,12 @@ def _in_skip_dir(rel: str) -> bool:
 MOD_DIRS = ["mods", "mod", "addons", "plugins", "custom", "workshop", "usermods", "~mods", "content/paks/~mods", "data/scripts", "bepinex/plugins"]
 
 # known games: better routes than the engine default
+BANNERLORD_ROUTE = ("official module system: Modules/<id>/SubModule.xml + ModuleData XML/XSLT and C# MBSubModuleBase; "
+                   "optional Bannerlord.Harmony for managed patches; inspect the installed TaleWorlds DLLs")
+BANNERLORD_BIN_DIRS = ("win64_shipping_client", "gaming.desktop.x64_shipping_client", "win64_shipping_weditor")
 KNOWN = {
+    "mount & blade ii: bannerlord": (BANNERLORD_ROUTE, "bannerlord.md"),
+    "mount & blade ii bannerlord": (BANNERLORD_ROUTE, "bannerlord.md"),
     "terraria": ("tModLoader (free Steam app 1281930): C# ModItem/ModNPC/ModProjectile/ModSystem, hot reload from ModSources", "dotnet-xna.md"),
     "stardew valley": ("SMAPI + Content Patcher (JSON content packs) or C# SMAPI mods with Harmony", "dotnet-xna.md"),
     "celeste": ("Everest + Olympus; C# code mods with MonoMod hooks, maps with Lönn/Ahorn", "dotnet-xna.md"),
@@ -446,6 +452,7 @@ def online_only(name: str) -> str | None:
 
 ENGINES = {
     # key: (label, playbook, route)
+    "bannerlord": ("Bannerlord (TaleWorlds native engine + managed modules)", "bannerlord.md", BANNERLORD_ROUTE),
     "unity-mono": ("Unity (Mono)", "unity.md", "BepInEx 5 (or MelonLoader) plugin in C# with HarmonyX patches; read Managed/Assembly-CSharp.dll with ILSpy; assets via AssetRipper/UABEA"),
     "unity-il2cpp": ("Unity (IL2CPP)", "unity.md", "BepInEx 6 (IL2CPP) or MelonLoader; recover types with Cpp2IL / Il2CppDumper, patch through Il2CppInterop"),
     "unreal": ("Unreal Engine", "unreal.md", "UE4SS (Lua/C++ hooks, live property viewer) and/or pak mods in Content/Paks/~mods (FModel to browse, retoc/repak to pack)"),
@@ -462,8 +469,11 @@ ENGINES = {
     "genie": ("Genie (Age of Empires DE)", "genie-aoe2.md", "data mods (genieutils-py), graphics/UI mods, scenarios; SLD sprites"),
     "clausewitz": ("Paradox Clausewitz/Jomini", "misc-engines.md", "script mods (plain text) in Documents/Paradox Interactive/<game>/mod"),
     "re-engine": ("Capcom RE Engine", "big-frameworks.md", "REFramework (Lua scripts, in-game UI) + Fluffy Mod Manager for pak/natives replacements"),
+    "mt-framework": ("Capcom MT Framework", "big-frameworks.md", ".arc archives under native*/ (nativePC, nativeDX10, ...): ARCtool to unpack/repack, Fluffy Mod Manager to install; DeadRisingEx for Dead Rising; native code via DLL hooks"),
     "fromsoft": ("FromSoftware (Dantelion)", "big-frameworks.md", "ModEngine2 + Smithbox/DSMapStudio, param edits; offline only"),
     "rage": ("Rockstar RAGE", "big-frameworks.md", "story mode: ScriptHookV + ASI loader, OpenIV/CodeWalker for assets; never online"),
+    "hedgehog": ("Hedgehog Engine (Sonic Team)", "big-frameworks.md", "Hedge Mod Manager + its HE1/HE2 mod loaders (Generations, Lost World, Forces, Frontiers, Shadow Generations) or Unleashed Recompiled's built-in loader: mod.ini folders of loose file replacements"),
+    "blackrock": ("Black Rock Studio engine (Split/Second)", "big-frameworks.md", "no community tools: .ark packs, .model/.textures assets and plaintext .params config to reverse yourself; native code via DLL hooks"),
     "redengine": ("CD Projekt REDengine", "big-frameworks.md", "REDmod, Cyber Engine Tweaks, RED4ext, WolvenKit (Cyberpunk); REDkit (Witcher 3)"),
     "idtech": ("id Tech / Doom family", "misc-engines.md", "WAD/PK3/PK4 mods, source ports"),
     "cryengine": ("CryEngine", "native.md", "pak (zip) overrides, Lua/XML where exposed; native hooks otherwise"),
@@ -493,6 +503,25 @@ def detect(ix: Index) -> tuple[list[tuple[str, int, list[str], dict]], dict]:
 
     def add(key, score, ev, **det):
         hits.append((key, score, ev, det))
+
+    # Bannerlord has its own module system; a managed launcher alone suggests the wrong generic .NET route.
+    bannerlord_dlls = ix.find(*(f"bin/{d}/taleworlds.mountandblade.dll" for d in BANNERLORD_BIN_DIRS))
+    if bannerlord_dlls and ix.has("modules/native/submodule.xml"):
+        dll = min(bannerlord_dlls, key=lambda f: BANNERLORD_BIN_DIRS.index(f.split("/")[1]))
+        version_file = dll.rsplit("/", 1)[0] + "/version.xml"
+        det = dict(product="Mount and Blade II Bannerlord")
+        if version_file in ix.files:
+            # the two shapes builds have shipped (BUTR's Bannerlord.ReferenceAssemblies reads the same two): a Value on
+            # the root, or <Singleplayer Value="v1.2.9"/> inside it. Older builds have no Version.xml on disk at all.
+            try:
+                root = ET.parse(ix.path(version_file)).getroot()
+                sp = root.find("Singleplayer")
+                version = (root.get("Value") or ((sp.get("Value") or sp.get("value")) if sp is not None else None) or "").strip()
+                if version:
+                    det.update(version=version, version_file=version_file)
+            except (OSError, ET.ParseError, LookupError, ValueError):
+                pass
+        add("bannerlord", 100, [dll, "modules/native/submodule.xml"], **det)
 
     # Unity
     data_dirs = [d for d in {"/".join(f.split("/")[:-1]) for f in ix.find("*_data/globalgamemanagers", "*_data/data.unity3d", "*_data/maindata")}]
@@ -649,9 +678,26 @@ def detect(ix: Index) -> tuple[list[tuple[str, int, list[str], dict]], dict]:
     if ix.has("re_chunk_000.pak", "re_chunk_000.pak.*"):
         add("re-engine", 100, ["re_chunk_000.pak"])
 
+    # Capcom MT Framework: .arc archives under a native* folder whose name depends on the port: nativePC (Dragon's
+    # Dogma: Dark Arisen), nativePC_MT (Resident Evil 5), nativeDX10 (Devil May Cry 4 SE), nativeWin64 (Dead Rising)
+    if ix.has("native*/*.arc"):
+        add("mt-framework", 95, ix.find("native*/*.arc")[:2])
+
     # FromSoftware
     if ix.has("eldenring.exe", "game/eldenring.exe", "darksoulsiii.exe", "game/darksoulsiii.exe", "sekiro.exe", "armoredcore6.exe", "game/armoredcore6.exe", "nightreign.exe", "game/nightreign.exe") or ix.has("*/regulation.bin", "regulation.bin"):
         add("fromsoft", 95, ix.find("*eldenring.exe", "*darksoulsiii.exe", "*sekiro.exe", "*armoredcore6.exe", "*nightreign.exe", "*regulation.bin")[:2])
+
+    # Sonic Team's Hedgehog Engine: the exes Hedge Mod Manager looks for (HE1: Unleashed Recompiled, Generations,
+    # Lost World; HE2: Forces, Frontiers, Shadow Generations), or loose HE1 split archives (#ActD_Africa.ar.00 + .arl).
+    # Sonic Generations (2011) packs its .ar files into CRI bb*.cpk packfiles, so the archives alone don't catch it.
+    he_exes = ix.find("unleashedrecomp.exe", "unleashedrecomp", "sonicgenerations.exe", "slw.exe", "*sonic forces.exe",
+                      "sonicfrontiers.exe", "sonic_x_shadow_generations.exe")
+    if he_exes or (ix.has("*.arl") and ix.has("*.ar", "*.ar.??")):
+        add("hedgehog", 95, he_exes[:1] + ix.find("*.arl")[:1])
+
+    # Black Rock Studio's engine (Split/Second): .shaderinst shader instances next to .model assets
+    if ix.has("*.shaderinst") and ix.has("*.model"):
+        add("blackrock", 95, ix.find("*.shaderinst")[:1] + ix.find("*.model")[:1])
 
     # RAGE
     if ix.has("gta5.exe", "gta5_enhanced.exe", "playgtav.exe", "rdr2.exe", "gtaiv.exe") or (ix.has("*.rpf") and ix.has("*.exe")):
@@ -743,6 +789,8 @@ def scan(query: str) -> dict:
     anti = [n for n, pats in ANTI_CHEAT if ix.has(*pats) or ix.has_dir(*[p.rstrip("/*") for p in pats if p.endswith("/*")])]
     loaders = [n for n, pats in LOADERS if ix.has(*pats) or ix.has_dir(*[p.rstrip("/*") for p in pats if p.endswith("/*")])]
     moddirs = [d for d in MOD_DIRS if d in ix.dirs]
+    if key == "bannerlord" and "modules" in ix.dirs:
+        moddirs.append("modules")
     name = (game.get("name") or root.name)
     lname = name.lower()
     known = next((v for k, v in sorted(KNOWN.items(), key=lambda kv: -len(kv[0])) if k == lname or (k in lname and len(k) > 5)), None) \
@@ -753,7 +801,7 @@ def scan(query: str) -> dict:
         routes.append(dict(route=known[0], playbook=known[1], why="known game"))
     if not known or known[1] != playbook or key == "native":
         routes.append(dict(route=route, playbook=playbook, why=f"engine: {label}"))
-    if key not in ("native",):
+    if key not in ("native", "bannerlord"):
         routes.append(dict(route=ENGINES["native"][2], playbook="native.md", why="fallback when no loader reaches what you need"))
     warnings = []
     if len(ix.files) < 5:

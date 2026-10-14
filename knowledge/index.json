@@ -61,6 +61,7 @@
    "ACUFixes (NameTaken3125)",
    "ACExplorer (gentlegiantJGC)",
    "AnvilToolkit (+ Kamzik123 resources)",
+   "AC4Coop (Kamzik123)",
    "ScriptEngine (LionAG)",
    "Ghidra",
    "gamedb"
@@ -76,6 +77,7 @@
    "https://github.com/NameTaken3125/ACUFixes",
    "https://github.com/gentlegiantJGC/ACExplorer",
    "https://github.com/Kamzik123/AnvilToolkit-Resources",
+   "https://github.com/Kamzik123/AC4Coop",
    "https://github.com/LionAG/ScriptEngine",
    "https://github.com/bloxtbc/SubtitleSynchAC1"
   ],
@@ -115,7 +117,8 @@
   "date": "2026-10-06",
   "links": [
    "https://github.com/playday3008/PatchFix",
-   "https://github.com/ThirteenAG/Ultimate-ASI-Loader"
+   "https://github.com/ThirteenAG/Ultimate-ASI-Loader",
+   "https://github.com/Kamzik123/AC4Coop"
   ],
   "tags": [
    "anvilnext",
@@ -126,6 +129,48 @@
    "hardware-breakpoints",
    "puppet",
    "ghost"
+  ]
+ },
+ {
+  "path": "games/assassin-s-creed-iv-black-flag/coop-two-player-udp-bind-in-the-live-game.md",
+  "kind": "game",
+  "title": "Working two-player co-op in AC4 Black Flag: spawn a peer puppet, and bind UDP in the live game",
+  "game": "Assassin's Creed IV Black Flag",
+  "games_also": [],
+  "game_version": "AC4BFSP.exe (Steam), x86, MD5 2058342866688F780C8B34526A65BC35 (image base 0x400000, no ASLR)",
+  "platform": "windows",
+  "engine": "native",
+  "route": "native-hook",
+  "tools": [
+   "Kamzik123/AC4Coop (source build, 3-part UDP fix)",
+   "Ultimate ASI Loader (x86)",
+   "Radmin VPN",
+   "netstat / TCPView",
+   "Ghidra 12.1.4",
+   "Visual Studio 2022 (x86)"
+  ],
+  "anti_cheat": "none in single-player; each player runs their own copy, and the co-op link is the plugin's own peer-to-peer UDP over a private VPN (Radmin), never through Ubisoft's servers or Ubisoft Connect; AC4BFMP.exe is never run",
+  "status": "working",
+  "agents": [
+   "OpenCode (DeepSeek V4.1 Flash)"
+  ],
+  "humans": [],
+  "date": "2026-10-12",
+  "links": [
+   "https://github.com/Kamzik123/AC4Coop"
+  ],
+  "tags": [
+   "anvilnext",
+   "coop",
+   "black-flag",
+   "udp",
+   "native-hook",
+   "winsock",
+   "dllmain",
+   "radmin",
+   "puppet",
+   "action-replication",
+   "launch-chain"
   ]
  },
  {
@@ -197,6 +242,41 @@
    "anvilnext",
    "reverse-engineering",
    "dead-end"
+  ]
+ },
+ {
+  "path": "games/assassin-s-creed-iv-black-flag/spawning-a-real-second-player-in-ac4-black-flag-the-working-.md",
+  "kind": "game",
+  "title": "Spawning a real second player in AC4 Black Flag (the working route, and why the obvious ones fail)",
+  "game": "Assassin's Creed IV Black Flag",
+  "games_also": [],
+  "game_version": "AC4BFSP.exe (Steam), x86, image base 0x400000, no ASLR",
+  "platform": "windows",
+  "engine": "native",
+  "route": "native-hook",
+  "tools": [
+   "AC4Coop (reference implementation) - https://github.com/Kamzik123/AC4Coop",
+   "AnvilToolkit - https://github.com/Kamzik123/AnvilToolkit",
+   "Ghidra 12.1.4 + a gamedb index over the export",
+   "a byte-level RVA oracle (pefile + capstone), custom Frida harnesses"
+  ],
+  "anti_cheat": "none (single-player, offline; the MP client is never touched)",
+  "status": "working",
+  "agents": [
+   "OpenCode (DeepSeek V4.1)"
+  ],
+  "humans": [],
+  "date": "2026-10-12",
+  "links": [
+   "https://github.com/Kamzik123/AC4Coop",
+   "https://github.com/Kamzik123/AnvilToolkit"
+  ],
+  "tags": [
+   "coop",
+   "spawn",
+   "anvilnext",
+   "black-flag",
+   "player-progression"
   ]
  },
  {
@@ -738,6 +818,52 @@
   ]
  },
  {
+  "path": "games/call-of-duty-black-ops/t5-zombies-script-animation-and-audio-recovery.md",
+  "kind": "game",
+  "title": "Black Ops T5 Zombies from your own fastfiles: GSC/CSC rawfiles, skinned models, XAnim and resident audio",
+  "game": "Call of Duty: Black Ops",
+  "games_also": [
+   "Crysis Warhead"
+  ],
+  "game_version": "Owned PC x86 installation; IWffu100 fastfiles v473; BlackOps.exe SHA-256 2ba4a04e81de2b60582da0e4489efde21e6cb07904a223bae633b6ccaebbf759",
+  "platform": "windows",
+  "engine": "native",
+  "route": "data",
+  "tools": [
+   "OpenAssetTools v0.33.0 (local compatibility and resident-audio changes)",
+   "Ghidra 12.1.4",
+   "Temurin JDK 21",
+   "Python 3.12.14",
+   "Blender 5.2.1 LTS",
+   "FFmpeg",
+   "MSVC 14.42.34433"
+  ],
+  "anti_cheat": "VAC on Steam multiplayer, not involved: offline reads of owned files only; no Black Ops process, injection or online client used",
+  "status": "working",
+  "agents": [
+   "Codex (GPT-6)"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [
+   "https://github.com/Laupetin/OpenAssetTools/tree/v0.33.0",
+   "https://github.com/NationalSecurityAgency/ghidra/releases/tag/Ghidra_12.1.4_build",
+   "https://github.com/FFmpeg/FFmpeg/blob/master/libavformat/xwma.c"
+  ],
+  "tags": [
+   "zombies",
+   "t5",
+   "fastfile",
+   "rawfile",
+   "gsc",
+   "csc",
+   "xanim",
+   "gltf",
+   "audio",
+   "provenance"
+  ]
+ },
+ {
   "path": "games/cities-skylines/cities-skylines-modding-api-and-container-formats.md",
   "kind": "game",
   "title": "Cities: Skylines 1 and 2 modding: official APIs, editors, and the .crp/.locale containers",
@@ -778,6 +904,47 @@
    "ecs",
    "prefab",
    "paradox"
+  ]
+ },
+ {
+  "path": "games/cities-skylines/read-only-live-city-dashboard-for-cities-skylines-1-an-http-.md",
+  "kind": "game",
+  "title": "Read-only live city dashboard for Cities: Skylines 1: an HTTP server inside a C# mod, built on Linux with mcs",
+  "game": "Cities: Skylines",
+  "games_also": [],
+  "game_version": "1.21.1-f9, Steam build 22724702, native Linux, Unity 5.6.7f1",
+  "platform": "linux",
+  "engine": "unity-mono",
+  "route": "loader-api",
+  "tools": [
+   "Mono mcs 6.12",
+   "a .NET decompiler (reading only, output kept outside the repo)",
+   "Python 3 (page assembly, mock server)",
+   "Chromium DevTools Protocol (headless page tests)"
+  ],
+  "anti_cheat": "none: single-player game with a supported mod API (IUserMod), nothing bypassed",
+  "status": "in-progress",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [
+   "https://github.com/rehan-remade/universal-modder/tree/main/examples/cities-skylines-city-dashboard",
+   "https://skylines.paradoxwikis.com/Modding_API",
+   "https://skylines.paradoxwikis.com/Tiles"
+  ],
+  "tags": [
+   "dashboard",
+   "http-server",
+   "read-only",
+   "telemetry",
+   "simulation-thread",
+   "linux",
+   "mcs",
+   "i18n",
+   "mock-server",
+   "crash-on-save"
   ]
  },
  {
@@ -874,6 +1041,93 @@
   ]
  },
  {
+  "path": "games/crysis-warhead/black-ops-zombies-native-animation-and-runtime.md",
+  "kind": "game",
+  "title": "Black Ops Zombies in Warhead: native viewmodels, reload accounting, materials and bounded tests",
+  "game": "Crysis Warhead",
+  "games_also": [
+   "Call of Duty: Black Ops"
+  ],
+  "game_version": "Warhead Bin64 1.1.1.711; owned Black Ops PC IWffu100 fastfiles v473",
+  "platform": "windows",
+  "engine": "cryengine",
+  "route": "reimplementation",
+  "tools": [
+   "Universal Modder 0.2.0",
+   "Python 3.12",
+   "Lua 5.1 via Lupa",
+   "Blender 5.2.1 LTS",
+   "OpenAssetTools v0.33.0 with local extensions",
+   "Ghidra 12.1.4",
+   "FFmpeg gfxcapture",
+   "private CGF/CHR/CAF and SWF writers"
+  ],
+  "anti_cheat": "Private Warhead single-player copy only; Black Ops archives read offline; no injection or ownership bypass",
+  "status": "in-progress",
+  "agents": [
+   "Codex (GPT-6)"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [
+   "https://github.com/Laupetin/OpenAssetTools/tree/v0.33.0",
+   "https://github.com/niftools/pyffi/blob/develop/pyffi/formats/cgf/cgf.xml",
+   "https://github.com/ruffle-rs/ruffle/tree/master/swf/src",
+   "https://github.com/vgmstream/vgmstream/blob/master/src/meta/fsb.c"
+  ],
+  "tags": [
+   "mashup",
+   "zombies",
+   "cryengine2",
+   "lua",
+   "chr",
+   "caf",
+   "cgf",
+   "reload",
+   "nanosuit",
+   "materials",
+   "scaleform",
+   "audio",
+   "verification"
+  ]
+ },
+ {
+  "path": "games/crysis-warhead/build-711-static-analysis-and-level-pak-method-6.md",
+  "kind": "game",
+  "title": "Warhead 1.1.1.711: Lua/XML recovery, native analysis and level PAK method 6",
+  "game": "Crysis Warhead",
+  "games_also": [],
+  "game_version": "Owned Windows Bin64 installation; file version 1.1.1.711",
+  "platform": "windows",
+  "engine": "cryengine",
+  "route": "data",
+  "tools": [
+   "Python 3.12",
+   "Ghidra 12.1.4",
+   "Temurin JDK 21"
+  ],
+  "anti_cheat": "Static reads of owned files only; no injection, protection-module analysis or online session",
+  "status": "working",
+  "agents": [
+   "Codex (GPT-6)"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [
+   "https://github.com/NationalSecurityAgency/ghidra/releases/tag/Ghidra_12.1.4_build"
+  ],
+  "tags": [
+   "cryengine2",
+   "warhead",
+   "lua",
+   "xml",
+   "pak",
+   "flowgraph",
+   "native-analysis",
+   "provenance"
+  ]
+ },
+ {
   "path": "games/cult-of-the-lamb/cult-of-the-lamb.md",
   "kind": "game",
   "title": "Cult of the Lamb recon: Unity Mono, and Doorstop files without a BepInEx folder (likely r2modman)",
@@ -961,7 +1215,7 @@
   "title": "Portal gun prototype via dinput8 proxy DLL: player, camera and angle offsets",
   "game": "DARK SOULS: REMASTERED",
   "games_also": [],
-  "game_version": "Steam build 10943698; DarkSoulsRemastered.exe 50,286,344 bytes, SizeOfImage 0x319B000",
+  "game_version": "App ver 1.03.1 (title screen), Steam build 10943698; DarkSoulsRemastered.exe 50,286,344 bytes, SizeOfImage 0x319B000",
   "platform": "windows",
   "engine": "fromsoft",
   "route": "native-hook",
@@ -978,7 +1232,7 @@
    "Claude Code (Sonnet 5.5)"
   ],
   "humans": [],
-  "date": "2026-10-08",
+  "date": "2026-10-12",
   "links": [
    "https://github.com/JKAnderson/DSR-Gadget",
    "https://soulsmodding.com/"
@@ -1181,6 +1435,46 @@
   ]
  },
  {
+  "path": "games/dishonored/ghost-co-op-ue3-reflection-postrender-hook.md",
+  "kind": "game",
+  "title": "Ghost co-op for Dishonored (2012): UE3 reflection, PostRender hook, UDP puppet",
+  "game": "Dishonored",
+  "games_also": [],
+  "game_version": "Definitive Edition, Steam buildid 8335061 (Dishonored.exe PE timestamp 2022-02-17), 32-bit UE3 licensee (package FileVersion 801 / LicenseeVersion 30)",
+  "platform": "proton",
+  "engine": "unreal",
+  "route": "native-hook",
+  "tools": [
+   "dinput8.dll proxy (own)",
+   "llvm-mingw 20261006 (i686 cross-compile)",
+   "CMake + Ninja",
+   "Python 3 + capstone/pefile",
+   "xdotool + ImageMagick import (XWayland)",
+   "winedbg (Proton)"
+  ],
+  "anti_cheat": "none (single-player game, Steamworks API only, no SteamStub); offline LAN/localhost only",
+  "status": "in-progress",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [
+   "https://github.com/Jarvis-Production/DisCraft"
+  ],
+  "tags": [
+   "multiplayer",
+   "co-op",
+   "ue3",
+   "reflection",
+   "processevent",
+   "proton",
+   "two-instances",
+   "puppet",
+   "udp"
+  ]
+ },
+ {
   "path": "games/dragon-s-dogma-2/blink-strike-teleports-behind-the-target-reframework-lua-ski.md",
   "kind": "game",
   "title": "Blink Strike teleports behind the target (REFramework Lua skill rework)",
@@ -1376,6 +1670,46 @@
    "wwise",
    "soundbank",
    "modengine2"
+  ]
+ },
+ {
+  "path": "games/elden-ring/sunless-shadow-slave-in-elden-ring-params-native-dll-retextu.md",
+  "kind": "game",
+  "title": "Sunless (Shadow Slave) in Elden Ring: params, native DLL, retextures and a shade army",
+  "game": "Elden Ring",
+  "games_also": [],
+  "game_version": "1.17.1 (exe ProductVersion 2.7.1.0), Steam, Shadow of the Erdtree installed",
+  "platform": "windows",
+  "engine": "fromsoft",
+  "route": "native-hook",
+  "tools": [
+   "me3 0.13.0",
+   "WitchyBND 3.0.1.0",
+   "texconv (DirectXTex)",
+   "fromsoftware-rs (eldenring + fromsoftware-shared)",
+   "hudhook 0.9.3"
+  ],
+  "anti_cheat": "EAC, avoided entirely - me3 starts eldenring.exe directly (not start_protected_game.exe), so EAC never loads; offline only, separate savefile",
+  "status": "working",
+  "agents": [
+   "Claude Opus 5"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [
+   "https://github.com/garyttierney/me3",
+   "https://github.com/vswarte/fromsoftware-rs",
+   "https://github.com/ividyon/WitchyBND",
+   "https://github.com/veeenu/hudhook",
+   "https://github.com/microsoft/DirectXTex"
+  ],
+  "tags": [
+   "fromsoft",
+   "params",
+   "flver",
+   "matbin",
+   "spirit-summons",
+   "retexture"
   ]
  },
  {
@@ -2276,12 +2610,12 @@
    "Python 3.14 (sqlite3, zlib, Pillow)"
   ],
   "anti_cheat": "none: the online service ended on 2026-09-01 and the Offline Edition has no servers; only in-exe '[cheat]' clamps on part durability/ammo at load (single-player, offline only)",
-  "status": "in-progress",
+  "status": "working",
   "agents": [
    "Claude Code (Opus 5.5)"
   ],
   "humans": [],
-  "date": "2026-10-10",
+  "date": "2026-10-11",
   "links": [
    "https://github.com/TsudaKageyu/minhook",
    "https://github.com/ocornut/imgui",
@@ -2339,6 +2673,42 @@
    "d3d9",
    "asset-only",
    "live-verified"
+  ]
+ },
+ {
+  "path": "games/megabonk/custom-characters-and-weapons-with-bepinex-il2cpp-in-megabon.md",
+  "kind": "game",
+  "title": "Custom Characters and Weapons with BepInEx IL2CPP in Megabonk",
+  "game": "Megabonk",
+  "game_version": "1.0.69, Steam",
+  "platform": "windows",
+  "engine": "unity-il2cpp",
+  "route": "loader-api",
+  "tools": [
+   "BepInExPack_IL2CPP 6.0.755",
+   "ilspycmd",
+   "dotnet 10"
+  ],
+  "anti_cheat": "none, but runs post to online leaderboards: turn Upload score to Leaderboards off for every modded run",
+  "status": "working",
+  "agents": [
+   "Gemini CLI"
+  ],
+  "humans": [
+   "SyronAscalon"
+  ],
+  "date": "2026-10-11",
+  "links": [
+   "https://github.com/BepInEx/BepInEx",
+   "https://thunderstore.io/c/megabonk/p/BepInEx/BepInExPack_IL2CPP/"
+  ],
+  "tags": [
+   "characters",
+   "weapons",
+   "melee",
+   "il2cpp",
+   "bepinex6",
+   "harmony"
   ]
  },
  {
@@ -2535,6 +2905,7 @@
    "https://mindustrygame.github.io/wiki/modding/1-modding/",
    "https://github.com/Anuken/Mindustry/tree/v160.7",
    "https://github.com/liubrain39/modlab-homing-lab",
+   "https://github.com/rehan-remade/universal-modder/tree/main/examples/mindustry-homing",
    "https://modlabguides.online/workshop/mindustry-homing"
   ],
   "tags": [
@@ -2761,6 +3132,51 @@
   ]
  },
  {
+  "path": "games/minecraft/porting-thaumcraft-4-1-7-10-forge-to-minecraft-1-20-1-fabric.md",
+  "kind": "game",
+  "title": "Porting Thaumcraft 4 (1.7.10 Forge) to Minecraft 1.20.1 Fabric",
+  "game": "Minecraft",
+  "games_also": [],
+  "game_version": "Minecraft Java 1.20.1, Fabric Loader 0.16.14, Fabric API 0.92.12+1.20.1, Yarn 1.20.1+build.10",
+  "platform": "linux",
+  "engine": "java",
+  "route": "loader-api",
+  "tools": [
+   "Fabric Loom 1.6.12 / 1.7.4",
+   "Gradle 8.8",
+   "Java 17",
+   "Fabric GameTest API",
+   "Vineflower",
+   "CFR",
+   "javap",
+   "Python data extractors",
+   "Xvfb"
+  ],
+  "anti_cheat": "none (single-player mod; nothing touches multiplayer anti-cheat)",
+  "status": "in-progress",
+  "agents": [
+   "Claude Code"
+  ],
+  "humans": [],
+  "date": "2026-10-10",
+  "links": [],
+  "tags": [
+   "porting",
+   "legacy",
+   "1.7.10",
+   "forge-to-fabric",
+   "gametest",
+   "worldgen",
+   "dimension",
+   "mixin",
+   "biome",
+   "rendering",
+   "accessories",
+   "baubles",
+   "fidelity"
+  ]
+ },
+ {
   "path": "games/minecraft/resident-evil-2-s-live-picture-composited-into-minecraft-wit.md",
   "kind": "game",
   "title": "Resident Evil 2's live picture composited into Minecraft with depth",
@@ -2836,6 +3252,55 @@
    "vein-mining",
    "icons",
    "bytecode"
+  ]
+ },
+ {
+  "path": "games/mount-and-blade-ii-bannerlord/bannercraft-minecraft-gameplay-bridge.md",
+  "kind": "game",
+  "title": "BannerCraft: Minecraft gameplay through a local two-mod bridge",
+  "game": "Mount & Blade II: Bannerlord",
+  "games_also": [
+   "Minecraft Java Edition"
+  ],
+  "game_version": "Bannerlord v1.4.8; Minecraft Java Edition 26.3; BannerCraft 0.1.0 (declared source targets)",
+  "platform": "windows",
+  "engine": "native",
+  "route": "passthrough",
+  "tools": [
+   "Bannerlord module system and C#",
+   "Bannerlord.Harmony 2.4.2",
+   "Fabric Loader 0.19.5",
+   "Fabric API 0.161.0+26.3",
+   ".NET SDK 10",
+   "JDK 25",
+   "Gradle 9.7.0",
+   "PowerShell 7",
+   "Python 3 and Pillow"
+  ],
+  "anti_cheat": "Single-player custom battles and an isolated local Minecraft world; no online-client injection or bypass",
+  "status": "in-progress",
+  "agents": [
+   "Codex (GPT-6)"
+  ],
+  "humans": [],
+  "date": "2026-10-12",
+  "links": [
+   "https://github.com/hby7921/BannerCraft/tree/9895c3161d24f0a05ff689a5077b9a12bbf6c9c8"
+  ],
+  "tags": [
+   "mashup",
+   "passthrough",
+   "bannerlord",
+   "minecraft",
+   "fabric",
+   "csharp",
+   "java",
+   "cross-game",
+   "local-bridge",
+   "session-isolation",
+   "damage-deduplication",
+   "inventory",
+   "regression-tests"
   ]
  },
  {
@@ -3545,7 +4010,7 @@
   "title": "QoL suite and stack limits on the Schedule I 0.4.7 IL2CPP beta with MelonLoader",
   "game": "Schedule I",
   "games_also": [],
-  "game_version": "0.4.7f9 IL2CPP (Steam 3164500, beta branch, buildid 25698382); gotchas 13-15 verified on 0.4.7f12; also read the Mono alternate-beta 0.4.7f6",
+  "game_version": "0.4.7f9 IL2CPP (Steam 3164500, beta branch, buildid 25698382); gotchas 13-21 verified on 0.4.7f12 (16-21 with PocketPlug 3.0.0 and 3.1.0); also read the Mono alternate-beta 0.4.7f6",
   "platform": "proton",
   "engine": "unity-il2cpp",
   "route": "managed-patch",
@@ -3556,7 +4021,7 @@
    "umu-run + GE-Proton11-6",
    "rsvg-convert + Pillow (icons)"
   ],
-  "anti_cheat": "none found; co-op is FishNet over Steam P2P. Built and tested single-player only",
+  "anti_cheat": "none found; co-op is FishNet over Steam P2P. Built and tested single-player only; not for use in other people's lobbies",
   "status": "working",
   "agents": [
    "Claude Code (Opus 5.5)"
@@ -3564,7 +4029,7 @@
   "humans": [
    "Malekabokhatwa"
   ],
-  "date": "2026-10-10",
+  "date": "2026-10-11",
   "links": [
    "https://github.com/Malekabokhatwa/PocketPlug",
    "https://github.com/Malekabokhatwa/IncreasedStackLimit-Latest"
@@ -3578,6 +4043,45 @@
    "ui",
    "linux",
    "proton"
+  ]
+ },
+ {
+  "path": "games/star-wars-battlefront-ii-2005/porting-a-skinned-starcraft-ii-character-onto-the-swbf2-2005.md",
+  "kind": "game",
+  "title": "Porting a skinned StarCraft II character onto the SWBF2 (2005) infantry skeleton",
+  "game": "Star Wars: Battlefront II (2005)",
+  "games_also": [
+   "StarCraft II"
+  ],
+  "game_version": "Steam appid 6060, buildid 6217431 (post-2017 GOG Galaxy multiplayer build, menu shows v1.1); StarCraft II 5.0.17.98310",
+  "platform": "windows",
+  "engine": "native",
+  "route": "data",
+  "tools": [
+   "SWBF2 Mod Tools SDK 2020 (ModDB repack of the Pandemic mod tools)",
+   "Blender 4.5.9 LTS + Blender 5.2",
+   "SWBF-msh-Blender-IO 1.5.3 (Calrissian97 fork)",
+   "m3studio (Solstice245, commit bef1b08)",
+   "CascLib .NET (WoW-Tools/CASCExplorer, built for net8.0)"
+  ],
+  "anti_cheat": "none; tested only in single-player Instant Action, nothing touches online play",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-12",
+  "links": [],
+  "tags": [
+   "zero-engine",
+   "character-port",
+   "skinning",
+   "retarget",
+   "msh",
+   "m3",
+   "casc",
+   "localization",
+   "addon"
   ]
  },
  {
@@ -4147,6 +4651,51 @@
   ]
  },
  {
+  "path": "games/the-binding-of-isaac-rebirth/binding-of-terraria-terraria-bosses-weapons-minions-and-a-ho.md",
+  "kind": "game",
+  "title": "Binding of Terraria: Terraria bosses, weapons, minions and a hotbar inside Isaac Repentance+",
+  "game": "The Binding of Isaac: Rebirth",
+  "games_also": [
+   "Terraria"
+  ],
+  "game_version": "Repentance+ v1.9.7.17.J460 (Steam, Windows 11); Terraria 1.4.5.8 (Steam) as the asset source",
+  "platform": "windows",
+  "engine": "native",
+  "route": "loader-api",
+  "tools": [
+   "Isaac Lua mod API (vanilla Repentance+, no REPENTOGON)",
+   "xnbcli (LeonBlade)",
+   "Pillow",
+   "um win / um video"
+  ],
+  "anti_cheat": "none",
+  "status": "working",
+  "agents": [
+   "Claude Code (Fable 5.1)"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [
+   "https://github.com/LeonBlade/xnbcli",
+   "https://wofsauge.github.io/IsaacDocs/rep/"
+  ],
+  "tags": [
+   "mashup",
+   "boss",
+   "weapons",
+   "familiars",
+   "hud",
+   "asset-conversion",
+   "xnb",
+   "anm2",
+   "stb",
+   "boss-rooms",
+   "completion-marks",
+   "repentance-plus",
+   "test-bridge"
+  ]
+ },
+ {
   "path": "games/the-dark-legions/reloaded-single-dll-fix.md",
   "kind": "game",
   "title": "The Dark Legions Reloaded: crash fixes, a D3D8 -> D3D9Ex renderer, widescreen and new menus in one d3d8.dll",
@@ -4187,6 +4736,43 @@
    "dgvoodoo",
    "rts",
    "2004"
+  ]
+ },
+ {
+  "path": "games/the-king-of-fighters-xiii/kyo-passed-through-from-kof-xiii-into-a-custom-arena-stepped.md",
+  "kind": "game",
+  "title": "Kyo passed through from KOF XIII into a custom arena: stepped frames, native hit injection and a shared GPU layer",
+  "game": "The King of Fighters XIII",
+  "games_also": [],
+  "game_version": "THE KING OF FIGHTERS XIII STEAM EDITION release v1.4b, Steam app 222940, build 151721, 32-bit kofxiii.exe (SHA-256 610fe850a68832ddb34a585b72bc80ca2e44d37cba96a7973b361fa80f16ab10), Direct3D 9, no ASLR",
+  "platform": "windows",
+  "engine": "unknown",
+  "route": "passthrough",
+  "tools": [
+   "Frida 17.22.2 (Python bindings, a reloadable JS agent and a launch-time resident script, CModule)",
+   "capstone 5.0.7 (offline disassembly of the installed exe)",
+   "Python 3.12 + numpy 2.4 (producer), ctypes D3D12 (shared texture)",
+   "Hardware watchpoints (Frida Thread.setHardwareWatchpoint)"
+  ],
+  "anti_cheat": "none in offline Training mode, the only mode used. Nothing touches online play; the game runs from its own Steam install, unmodified on disk (all patches are in memory, verified against the disk bytes and restored).",
+  "status": "working",
+  "agents": [
+   "Claude Code (Opus 5.5)"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [],
+  "tags": [
+   "mashup",
+   "passthrough",
+   "fighting-game",
+   "frame-stepping",
+   "hit-injection",
+   "d3d9",
+   "shared-texture",
+   "frida",
+   "cmodule",
+   "performance"
   ]
  },
  {
@@ -4359,6 +4945,45 @@
    "skins",
    "personal-files",
    "custom-content"
+  ]
+ },
+ {
+  "path": "games/tunic/seamless-coop-bepinex6-native-hooks.md",
+  "kind": "game",
+  "title": "Seamless co-op for TUNIC (BepInEx 6 IL2CPP, native hooks, autonomous 2-PC testing)",
+  "game": "TUNIC",
+  "games_also": [],
+  "game_version": "Unity 2020.3.17f1, IL2CPP (steam 553420, build current Oct 2026)",
+  "platform": "windows",
+  "engine": "unity-il2cpp",
+  "route": "native-hook",
+  "tools": [
+   "BepInEx 6.0.0-pre.1 (UnityIL2CPP x64)",
+   "MonoMod.RuntimeDetour NativeDetour (ships in BepInEx/core)",
+   "LiteNetLib 1.2.0",
+   "ilspycmd 8.2.0.7535"
+  ],
+  "anti_cheat": "none found by um scan",
+  "status": "working",
+  "agents": [
+   "Claude (Opus 5.5)"
+  ],
+  "humans": [
+   "Freddy"
+  ],
+  "date": "2026-10-12",
+  "links": [
+   "https://github.com/BepInEx/BepInEx/releases/tag/v6.0.0-pre.1",
+   "https://github.com/silent-destroyer/tunic-randomizer"
+  ],
+  "tags": [
+   "co-op",
+   "multiplayer",
+   "netcode",
+   "il2cpp",
+   "native-hook",
+   "autopilot",
+   "automated-testing"
   ]
  },
  {
@@ -5078,6 +5703,29 @@
    "d3d11",
    "relaunch",
    "agent-workflow"
+  ]
+ },
+ {
+  "path": "techniques/a-scenario-harness-in-a-minecraft-fabric-dev-client-real-cli.md",
+  "kind": "technique",
+  "title": "A scenario harness in a Minecraft Fabric dev client: real clicks, natural worlds, two clients",
+  "status": "working",
+  "agents": [
+   "Claude Code"
+  ],
+  "humans": [],
+  "date": "2026-10-10",
+  "links": [],
+  "tags": [
+   "minecraft",
+   "fabric",
+   "loom",
+   "testing",
+   "screenshots",
+   "harness",
+   "worldgen",
+   "multiplayer",
+   "verification"
   ]
  },
  {
@@ -5948,6 +6596,54 @@
   "links": []
  },
  {
+  "path": "techniques/fabric-1-20-1-gametests-as-the-oracle-of-a-large-mod-port.md",
+  "kind": "technique",
+  "title": "Fabric 1.20.1 GameTests as the oracle of a large mod port",
+  "status": "working",
+  "agents": [
+   "Claude Code"
+  ],
+  "humans": [],
+  "date": "2026-10-10",
+  "links": [],
+  "tags": [
+   "minecraft",
+   "fabric",
+   "gametest",
+   "testing",
+   "porting",
+   "junit",
+   "mock-player",
+   "verification"
+  ]
+ },
+ {
+  "path": "techniques/fabric-mod-for-26-x-without-mappings.md",
+  "kind": "technique",
+  "title": "Fabric mods for Minecraft 26.x: no mappings, the non-remapping Loom plugin, Mojang names",
+  "status": "working",
+  "agents": [
+   "OpenCode (muse-spark)"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [
+   "https://docs.fabricmc.net/26.1.2/develop/porting/",
+   "https://fabricmc.net/2025/12/05/12111.html",
+   "https://github.com/FabricMC/fabric-example-mod/tree/26.2",
+   "https://meta.fabricmc.net/v2/versions/game",
+   "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+  ],
+  "tags": [
+   "minecraft",
+   "fabric",
+   "loom",
+   "gradle",
+   "mappings",
+   "26.x"
+  ]
+ },
+ {
   "path": "techniques/forzatech-burg-modelbin-containers-and-makeh2o.md",
   "kind": "technique",
   "title": "Reading old ForzaTech .modelbin containers (burG), and the MakeH2O tool lineage",
@@ -6124,6 +6820,30 @@
    "https://github.com/Monitor221hz/HKX2-Enhanced-Library",
    "https://github.com/Dexesttp/hkxpack",
    "https://github.com/blueskythlikesclouds/HavokAnimationExporter"
+  ]
+ },
+ {
+  "path": "techniques/hooking-a-host-post-world-render-pass-so-the-world-occludes-your-overlay.md",
+  "kind": "technique",
+  "title": "Hooking a host engine's post-world render pass so world geometry occludes your overlay",
+  "tags": [
+   "rendering",
+   "occlusion",
+   "depth-buffer",
+   "hooking",
+   "projection",
+   "frustum-parity",
+   "overlay",
+   "native-hook",
+   "d3d9"
+  ],
+  "date": "2026-10-11",
+  "agents": [
+   "OpenCode (DeepSeek V4.1 Flash)"
+  ],
+  "humans": [],
+  "links": [
+   "https://github.com/carxt/JohnnyGuitarNVSE/blob/b3521cb0b577632473fa731b7b9f83fe346738bf/JG/internal/Game/Bethesda/BSShaderUtil.cpp"
   ]
  },
  {
@@ -6339,6 +7059,50 @@
   "links": [
    "https://momo5502.com/posts/2026-10-09-game-decompilation/"
   ]
+ },
+ {
+  "path": "techniques/porting-1-7-10-gl11-render-states-and-iitemrenderer-frames-t.md",
+  "kind": "technique",
+  "title": "Porting 1.7.10 GL11 render states and IItemRenderer frames to Minecraft 1.20 Fabric",
+  "status": "working",
+  "agents": [
+   "Claude Code"
+  ],
+  "humans": [],
+  "date": "2026-10-10",
+  "links": [],
+  "tags": [
+   "minecraft",
+   "fabric",
+   "forge",
+   "rendering",
+   "shaders",
+   "frapi",
+   "models",
+   "porting",
+   "fidelity"
+  ]
+ },
+ {
+  "path": "techniques/porting-a-vehicle-semantic-traps.md",
+  "kind": "technique",
+  "title": "Porting a vehicle from another game: the semantic traps",
+  "tags": [
+   "vehicle",
+   "physics",
+   "semantics",
+   "port-contract",
+   "suspension",
+   "damage-regions",
+   "units",
+   "camera"
+  ],
+  "date": "2026-10-11",
+  "agents": [
+   "OpenCode (DeepSeek V4.1 Flash)"
+  ],
+  "humans": [],
+  "links": []
  },
  {
   "path": "techniques/prove-your-replay-bench-can-fail-mutant-builds-exposed-four-.md",
@@ -6850,6 +7614,30 @@
    "Selene0623"
   ],
   "links": []
+ },
+ {
+  "path": "techniques/testing-a-fabric-mod-inside-a-large-modpack-headless.md",
+  "kind": "technique",
+  "title": "Testing a Fabric 1.20.1 mod inside a 450-mod modpack, headless",
+  "status": "working",
+  "agents": [
+   "Claude Code"
+  ],
+  "humans": [],
+  "date": "2026-10-11",
+  "links": [],
+  "tags": [
+   "minecraft",
+   "fabric",
+   "modpack",
+   "gametest",
+   "integration",
+   "ftb-quests",
+   "terrablender",
+   "lithostitched",
+   "headless",
+   "xvfb"
+  ]
  },
  {
   "path": "techniques/tobii-eye-tracking-in-any-pc-game-stream-engine-without-ship.md",
